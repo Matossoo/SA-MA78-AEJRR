@@ -1,3 +1,4 @@
+-- Active: 1782929575403@@sa-ma78-aejrr-daduashdiodbaso.b.aivencloud.com@25794@alleanza_immobiliare
 CREATE TABLE Endereco (
     id_endereco INT AUTO_INCREMENT PRIMARY KEY,
     rua VARCHAR(150) NOT NULL,
@@ -56,6 +57,7 @@ CREATE TABLE Imovel (
     FOREIGN KEY (id_endereco) REFERENCES Endereco(id_endereco)
 );
 
+
 CREATE TABLE Visita (
     id_visita INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT,
@@ -63,9 +65,13 @@ CREATE TABLE Visita (
     id_imovel INT,
     data_visita DATETIME NOT NULL,
     observacoes TEXT,
+
     FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente),
     FOREIGN KEY (id_corretor) REFERENCES Corretor(id_corretor),
-    FOREIGN KEY (id_imovel) REFERENCES Imovel(id_imovel)
+    FOREIGN KEY (id_imovel) REFERENCES Imovel(id_imovel),
+
+    CONSTRAINT uc_imovel_janela_hora UNIQUE (id_imovel, data_visita),
+    CONSTRAINT uc_corretor_janela_hora UNIQUE (id_corretor, data_visita)
 );
 
 CREATE TABLE Venda (
