@@ -1,3 +1,4 @@
+-- Active: 1783535410055@@sa-ma78-aejrr-daduashdiodbaso.b.aivencloud.com@25794@alleanza_immobiliare
 -- ============================================
 -- CONSULTAS SQL - SISTEMA IMOBILIÁRIA
 -- ============================================
@@ -184,38 +185,6 @@ WHERE i.status = 'Disponível'
   AND t.descricao = 'Apartamento' 
   AND i.valor_sugerido BETWEEN 300000 AND 600000;
 
---2. Anúncios críticos que não possuem nenhuma foto cadastrada (Controle de Qualidade)
-
-SELECT a.id_anuncio, a.titulo, a.data_publicacao, i.id_imovel
-FROM Anuncio a
-JOIN Imovel i ON a.id_imovel = i.id_imovel
-LEFT JOIN FotoImovel f ON a.id_anuncio = f.id_anuncio
-WHERE f.id_foto IS NULL;
-
---3. Grandes Investidores: Proprietários que possuem mais de 3 imóveis cadastrados
-
-SELECT p.id_proprietario, p.nome, p.telefone, COUNT(i.id_imovel) AS total_imoveis
-FROM Proprietario p
-JOIN Imovel i ON p.id_proprietario = i.id_proprietario
-GROUP BY p.id_proprietario, p.nome, p.telefone
-HAVING COUNT(i.id_imovel) > 3
-ORDER BY total_imoveis DESC;
-
---4. Leads Frios: Clientes que visitaram imóveis mas nunca fecharam compra ou aluguel
-
-SELECT DISTINCT c.id_cliente, c.nome, c.email, c.telefone
-FROM Cliente c
-JOIN Visita v ON c.id_cliente = v.id_cliente
-WHERE c.id_cliente NOT IN (SELECT id_cliente FROM Venda)
-  AND c.id_cliente NOT IN (SELECT id_cliente FROM Aluguel);
-
---5. Faturamento total com Vendas agrupado por Mês e Ano (Relatório Comercial)
-
-SELECT YEAR(v.data_venda) AS ano, MONTH(v.data_venda) AS mes, COUNT(v.id_venda) AS qtd_vendas, SUM(v.valor_venda) AS total_faturado
-FROM Venda v
-GROUP BY YEAR(v.data_venda), MONTH(v.data_venda)
-ORDER BY ano DESC, mes DESC;
-
 --6. Receita recorrente prevista: Faturamento mensal total de Aluguéis ativos
 
 SELECT SUM(a.valor_aluguel) AS receita_mensal_total, COUNT(a.id_aluguel) AS contratos_ativos
@@ -229,7 +198,7 @@ SELECT con.id_contrato, cli.nome AS inquilino, alu.valor_aluguel, MAX(pag.data_p
 FROM Contrato con
 JOIN Aluguel alu ON con.id_aluguel = alu.id_aluguel
 JOIN Cliente cli ON alu.id_cliente = cli.id_cliente
-LEFT JOIN Pagamento pag ON con.id_contrato = pag.id_contrato
+JOIN Pagamento pag ON con.id_contrato = pag.id_contrato
 GROUP BY con.id_contrato, cli.nome, alu.valor_aluguel;
 
 --8. Inteligência de Mercado: Top 5 bairros mais caros baseado no valor sugerido de venda
@@ -243,15 +212,6 @@ GROUP BY e.bairro, e.cidade
 ORDER BY media_preco_imovel DESC
 LIMIT 5;
 
---9. Corretores Ociosos: Quem não realizou nenhuma visita nos últimos 30 dias
-
-SELECT corr.id_corretor, corr.nome, corr.creci, corr.telefone
-FROM Corretor corr
-WHERE corr.id_corretor NOT IN (
-    SELECT id_corretor 
-    FROM Visita 
-    WHERE data_visita >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-);
 
 --10. Auditoria de Status: Imóveis marcados como "Vendido" ou "Alugado" sem contrato assinado
 
@@ -267,17 +227,6 @@ WHERE i.status IN ('Vendido', 'Alugado')
 SELECT ROUND(AVG(DATEDIFF(v.data_venda, a.data_publicacao)), 0) AS media_dias_para_venda
 FROM Anuncio a
 JOIN Venda v ON a.id_imovel = v.id_imovel;
-
---12. Agenda Operacional: Listagem de visitas agendadas para o dia de hoje
-
-SELECT v.data_visita, c.nome AS cliente, c.telefone AS tel_cliente, corr.nome AS corretor, i.id_imovel, e.rua, e.numero
-FROM Visita v
-JOIN Cliente c ON v.id_cliente = c.id_cliente
-JOIN Corretor corr ON v.id_corretor = corr.id_corretor
-JOIN Imovel i ON v.id_imovel = i.id_imovel
-JOIN Endereco e ON i.id_endereco = e.id_endereco
-WHERE DATE(v.data_visita) = CURDATE()
-ORDER BY v.data_visita ASC;
 
 --13. Análise Financeira: Formas de pagamento mais utilizadas pelos clientes
 
@@ -329,25 +278,3 @@ FROM TipoImovel t
 LEFT JOIN Imovel i ON t.id_tipo_imovel = i.id_tipo_imovel
 GROUP BY t.id_tipo_imovel, t.descricao
 ORDER BY quantidade_em_estoque DESC;
-
---19. Campanhas de Pós-Venda/Boas-vindas: Contratos de aluguel iniciados nos últimos 7 dias
-
-SELECT alu.id_aluguel, cli.nome AS inquilino, cli.email, alu.data_inicio, e.rua, e.bairro
-FROM Aluguel alu
-JOIN Cliente cli ON alu.id_cliente = cli.id_cliente
-JOIN Imovel i ON alu.id_imovel = i.id_imovel
-JOIN Endereco e ON i.id_endereco = e.id_endereco
-WHERE alu.data_inicio BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE();
-
---20. Detalhes Completos da Ficha do Anúncio (Para o Painel Interno)
-
-SELECT 
-    a.id_anuncio, a.titulo, i.valor_sugerido, i.status,
-    CONCAT(e.rua, ', ', e.numero, ' - ', e.bairro, ' (', e.cidade, '/', e.estado, ')') AS endereco_completo,
-    p.nome AS proprietario, p.telefone AS telefone_proprietario,
-    (SELECT url_foto FROM FotoImovel WHERE id_anuncio = a.id_anuncio AND principal = TRUE LIMIT 1) AS foto_capa
-FROM Anuncio a
-JOIN Imovel i ON a.id_imovel = i.id_imovel
-JOIN Endereco e ON i.id_endereco = e.id_endereco
-JOIN Proprietario p ON i.id_proprietario = p.id_proprietario
-WHERE a.id_anuncio = 123; -- Substitua pelo ID do anúncio desejado
