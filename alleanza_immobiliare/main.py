@@ -13,6 +13,7 @@ from pagamento_model import *
 from imovel_documento_model import *
 from anuncio_model import *
 from foto_imovel_model import *
+from relatorio_model import *
 
 while True:
 
@@ -34,6 +35,7 @@ while True:
     print("13 - Imóvel Documento")
     print("14 - Anúncio")
     print("15 - Foto Imóvel")
+    print("16 - Gerar Relatórios 📊")  # <-- NOVA OPÇÃO ADICIONADA AQUI!
     print("0  - Sair")
 
     opcao = input("\nEscolha uma opção: ")
@@ -889,4 +891,23 @@ while True:
 
 
             elif escolha == "0":
+                break
+
+#==================================================
+# GERAÇÃO DE RELATÓRIOS (NOVO BLOCO NO FINAL)
+#==================================================
+    elif opcao == "16":
+        while True:
+            print("\n===== CENTRAL DE RELATÓRIOS 📊 =====")
+            print("1 - Exportar Corretores para Excel (.xlsx)")
+            print("2 - Exportar Corretores para PDF (.pdf)")
+            print("0 - Voltar ao Menu Principal")
+
+            escolha_relatorio = input("Escolha: ")
+
+            if escolha_relatorio == "1":
+                exportar_corretores_excel()
+            elif escolha_relatorio == "2":
+                exportar_corretores_pdf()
+            elif escolha_relatorio == "0":
                 break
