@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_vendas():
@@ -58,54 +60,32 @@ def cadastrar_venda(id_cliente,id_corretor,id_imovel,data_venda,valor_venda):
     conexao.close()
 
 
-def atualizar_venda(id_venda,id_cliente,id_corretor,id_imovel,data_venda,valor_venda):
-
-    conexao=conectar()
-    cursor=conexao.cursor()
-
-    sql="""
-    UPDATE Venda
-    SET
-        id_cliente=%s,
-        id_corretor=%s,
-        id_imovel=%s,
-        data_venda=%s,
-        valor_venda=%s
-    WHERE id_venda=%s
-    """
-
-    valores=(
-        id_cliente,
-        id_corretor,
-        id_imovel,
-        data_venda,
-        valor_venda,
-        id_venda
-    )
-
-    cursor.execute(sql,valores)
-    conexao.commit()
-
-    print(f"Venda {id_venda} atualizada!")
-
-    cursor.close()
-    conexao.close()
-
+def atualizar_venda(id_venda, id_cliente, id_corretor, id_imovel, data_venda, valor_venda):
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Venda 
+                 SET id_cliente=%s, id_corretor=%s, id_imovel=%s, data_venda=%s, valor_venda=%s 
+                 WHERE id_venda=%s"""
+        cursor.execute(sql, (id_cliente, id_corretor, id_imovel, data_venda, valor_venda, id_venda))
+        conexao.commit()
+        print("\n✅ Registro de venda atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro: Verifique se os IDs do cliente, corretor e imóvel informados existem!")
+    finally:
+        cursor.close()
+        conexao.close()
 
 def deletar_venda(id_venda):
-
-    conexao=conectar()
-    cursor=conexao.cursor()
-
-    sql="""
-    DELETE FROM Venda
-    WHERE id_venda=%s
-    """
-
-    cursor.execute(sql,(id_venda,))
-    conexao.commit()
-
-    print(f"Venda {id_venda} deletada!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Venda WHERE id_venda = %s"
+        cursor.execute(sql, (id_venda,))
+        conexao.commit()
+        print("\n✅ Registro de venda deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar esta venda porque existe um Contrato gerado e ativo para ela!")
+    finally:
+        cursor.close()
+        conexao.close()

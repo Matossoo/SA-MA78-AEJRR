@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_proprietarios():
@@ -67,63 +69,32 @@ def cadastrar_proprietario(nome, cpf_cnpj, telefone, email):
 
 
 def atualizar_proprietario(id_proprietario, nome, cpf_cnpj, telefone, email):
-    # abrir conexão
-    conexao = conectar()
-
-    # criar cursor
-    cursor = conexao.cursor()
-
-    # sql de atualização
-    sql = """
-    UPDATE Proprietario
-    SET
-        nome = %s,
-        cpf_cnpj = %s,
-        telefone = %s,
-        email = %s
-    WHERE id_proprietario = %s
-    """
-
-    valores = (
-        nome,
-        cpf_cnpj,
-        telefone,
-        email,
-        id_proprietario
-    )
-
-    # executa sql
-    cursor.execute(sql, valores)
-    conexao.commit()
-
-    print(f"Proprietário {id_proprietario} atualizado com sucesso!")
-
-    # fechar conexão
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Proprietario 
+                 SET nome=%s, cpf_cnpj=%s, telefone=%s, email=%s 
+                 WHERE id_proprietario=%s"""
+        cursor.execute(sql, (nome, cpf_cnpj, telefone, email, id_proprietario))
+        conexao.commit()
+        print("\n✅ Proprietário atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro: Este CPF/CNPJ já está cadastrado para outro proprietário.")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_proprietario(id_proprietario):
-    # abrir conexão
-    conexao = conectar()
-
-    # criar cursor
-    cursor = conexao.cursor()
-
-    # sql de exclusão
-    sql = """
-    DELETE FROM Proprietario
-    WHERE id_proprietario = %s
-    """
-
-    valores = (id_proprietario,)
-
-    # executa sql
-    cursor.execute(sql, valores)
-    conexao.commit()
-
-    print(f"Proprietário {id_proprietario} deletado com sucesso!")
-
-    # fechar conexão
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Proprietario WHERE id_proprietario = %s"
+        cursor.execute(sql, (id_proprietario,))
+        conexao.commit()
+        print("\n✅ Proprietário deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar este proprietário porque ele possui Imóveis cadastrados em seu nome!")
+    finally:
+        cursor.close()
+        conexao.close()

@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_pagamentos():
@@ -54,52 +56,33 @@ def cadastrar_pagamento(id_contrato,valor_pago,data_pagamento,forma_pagamento):
     conexao.close()
 
 
-def atualizar_pagamento(id_pagamento,id_contrato,valor_pago,data_pagamento,forma_pagamento):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE Pagamento
-    SET
-        id_contrato=%s,
-        valor_pago=%s,
-        data_pagamento=%s,
-        forma_pagamento=%s
-    WHERE id_pagamento=%s
-    """
-
-    valores = (
-        id_contrato,
-        valor_pago,
-        data_pagamento,
-        forma_pagamento,
-        id_pagamento
-    )
-
-    cursor.execute(sql,valores)
-    conexao.commit()
-
-    print("Pagamento atualizado!")
-
-    cursor.close()
-    conexao.close()
+def atualizar_pagamento(id_pagamento, id_contrato, valor_pago, data_pagamento, forma_pagamento):
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Pagamento 
+                 SET id_contrato=%s, valor_pago=%s, data_pagamento=%s, forma_pagamento=%s 
+                 WHERE id_pagamento=%s"""
+        cursor.execute(sql, (id_contrato, valor_pago, data_pagamento, forma_pagamento, id_pagamento))
+        conexao.commit()
+        print("\n✅ Pagamento atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro: O ID de contrato especificado não existe!")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_pagamento(id_pagamento):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    DELETE FROM Pagamento
-    WHERE id_pagamento=%s
-    """
-
-    cursor.execute(sql,(id_pagamento,))
-    conexao.commit()
-
-    print("Pagamento removido!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Pagamento WHERE id_pagamento = %s"
+        cursor.execute(sql, (id_pagamento,))
+        conexao.commit()
+        print("\n✅ Registro de pagamento deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro ao deletar pagamento devido a uma restrição de integridade.")
+    finally:
+        cursor.close()
+        conexao.close()

@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_clientes():
@@ -47,49 +49,32 @@ def cadastrar_cliente(nome, cpf, telefone, email):
 
 
 def atualizar_cliente(id_cliente, nome, cpf, telefone, email):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE Cliente
-    SET
-        nome = %s,
-        cpf = %s,
-        telefone = %s,
-        email = %s
-    WHERE id_cliente = %s
-    """
-
-    valores = (
-        nome,
-        cpf,
-        telefone,
-        email,
-        id_cliente
-    )
-
-    cursor.execute(sql, valores)
-    conexao.commit()
-
-    print(f"Cliente {id_cliente} atualizado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Cliente 
+                 SET nome=%s, cpf=%s, telefone=%s, email=%s 
+                 WHERE id_cliente=%s"""
+        cursor.execute(sql, (nome, cpf, telefone, email, id_cliente))
+        conexao.commit()
+        print("\n✅ Cliente atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro: Este CPF já está cadastrado para outro cliente.")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_cliente(id_cliente):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    DELETE FROM Cliente
-    WHERE id_cliente = %s
-    """
-
-    cursor.execute(sql, (id_cliente,))
-    conexao.commit()
-
-    print(f"Cliente {id_cliente} deletado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Cliente WHERE id_cliente = %s"
+        cursor.execute(sql, (id_cliente,))
+        conexao.commit()
+        print("\n✅ Cliente deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar este cliente porque ele possui registros de Visitas, Vendas ou Aluguéis vinculados!")
+    finally:
+        cursor.close()
+        conexao.close()

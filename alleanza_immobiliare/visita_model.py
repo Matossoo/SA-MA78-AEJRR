@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_visitas():
@@ -56,54 +58,38 @@ def cadastrar_visita(id_cliente, id_corretor, id_imovel, data_visita, observacoe
     conexao.close()
 
 
-def atualizar_visita(id_visita,id_cliente,id_corretor,id_imovel,data_visita,observacoes):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE Visita
-    SET
-        id_cliente=%s,
-        id_corretor=%s,
-        id_imovel=%s,
-        data_visita=%s,
-        observacoes=%s
-    WHERE id_visita=%s
-    """
-
-    valores = (
-        id_cliente,
-        id_corretor,
-        id_imovel,
-        data_visita,
-        observacoes,
-        id_visita
-    )
-
-    cursor.execute(sql,valores)
-    conexao.commit()
-
-    print(f"Visita {id_visita} atualizada!")
-
-    cursor.close()
-    conexao.close()
+def atualizar_visita(id_visita, id_cliente, id_corretor, id_imovel, data_visita, observacoes):
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Visita 
+                 SET id_cliente=%s, id_corretor=%s, id_imovel=%s, data_visita=%s, observacoes=%s 
+                 WHERE id_visita=%s"""
+        cursor.execute(sql, (id_cliente, id_corretor, id_imovel, data_visita, observacoes, id_visita))
+        conexao.commit()
+        print("\n✅ Visita atualizada com sucesso!")
+    except mysql.connector.errors.IntegrityError as err:
+        if "uc_imovel_janela_hora" in str(err):
+            print("\n❌ Erro: Este imóvel já possui uma visita agendada neste mesmo horário!")
+        elif "uc_corretor_janela_hora" in str(err):
+            print("\n❌ Erro: Este corretor já possui compromisso agendado neste mesmo horário!")
+        else:
+            print("\n❌ Erro: Verifique se os IDs do cliente, corretor e imóvel informados existem!")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_visita(id_visita):
-
-    conexao=conectar()
-    cursor=conexao.cursor()
-
-    sql="""
-    DELETE FROM Visita
-    WHERE id_visita=%s
-    """
-
-    cursor.execute(sql,(id_visita,))
-    conexao.commit()
-
-    print(f"Visita {id_visita} deletada!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Visita WHERE id_visita = %s"
+        cursor.execute(sql, (id_visita,))
+        conexao.commit()
+        print("\n✅ Agendamento de visita deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro ao deletar visita devido a uma restrição de integridade.")
+    finally:
+        cursor.close()
+        conexao.close()

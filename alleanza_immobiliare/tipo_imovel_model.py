@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_tipos_imovel():
@@ -42,38 +44,30 @@ def cadastrar_tipo_imovel(descricao):
 
 
 def atualizar_tipo_imovel(id_tipo_imovel, descricao):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE TipoImovel
-    SET
-        descricao = %s
-    WHERE id_tipo_imovel = %s
-    """
-
-    cursor.execute(sql, (descricao, id_tipo_imovel))
-    conexao.commit()
-
-    print(f"Tipo de imóvel {id_tipo_imovel} atualizado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "UPDATE TipoImovel SET descricao=%s WHERE id_tipo_imovel=%s"
+        cursor.execute(sql, (descricao, id_tipo_imovel))
+        conexao.commit()
+        print("\n✅ Tipo de imóvel atualizado com sucesso!")
+    except Exception as err:
+        print(f"\n❌ Erro ao atualizar tipo de imóvel: {err}")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_tipo_imovel(id_tipo_imovel):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    DELETE FROM TipoImovel
-    WHERE id_tipo_imovel = %s
-    """
-
-    cursor.execute(sql, (id_tipo_imovel,))
-    conexao.commit()
-
-    print(f"Tipo de imóvel {id_tipo_imovel} deletado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM TipoImovel WHERE id_tipo_imovel = %s"
+        cursor.execute(sql, (id_tipo_imovel,))
+        conexao.commit()
+        print("\n✅ Tipo de imóvel deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar este tipo de imóvel porque existem Imóveis cadastrados com esta descrição!")
+    finally:
+        cursor.close()
+        conexao.close()

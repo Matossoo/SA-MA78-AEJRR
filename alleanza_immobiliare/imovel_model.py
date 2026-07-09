@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_imoveis():
@@ -71,58 +73,33 @@ def cadastrar_imovel(id_proprietario,
     conexao.close()
 
 
-def atualizar_imovel(id_imovel,
-                     id_proprietario,
-                     id_tipo_imovel,
-                     id_endereco,
-                     valor_sugerido,
-                     status):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE Imovel
-    SET
-        id_proprietario = %s,
-        id_tipo_imovel = %s,
-        id_endereco = %s,
-        valor_sugerido = %s,
-        status = %s
-    WHERE id_imovel = %s
-    """
-
-    valores = (
-        id_proprietario,
-        id_tipo_imovel,
-        id_endereco,
-        valor_sugerido,
-        status,
-        id_imovel
-    )
-
-    cursor.execute(sql, valores)
-    conexao.commit()
-
-    print(f"Imóvel {id_imovel} atualizado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+def atualizar_imovel(id_imovel, id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status):
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Imovel 
+                 SET id_proprietario=%s, id_tipo_imovel=%s, id_endereco=%s, valor_sugerido=%s, status=%s 
+                 WHERE id_imovel=%s"""
+        cursor.execute(sql, (id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status, id_imovel))
+        conexao.commit()
+        print("\n✅ Imóvel atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro de Integridade: Verifique se o ID do proprietário, tipo do imóvel e endereço existem!")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_imovel(id_imovel):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    DELETE FROM Imovel
-    WHERE id_imovel = %s
-    """
-
-    cursor.execute(sql, (id_imovel,))
-    conexao.commit()
-
-    print(f"Imóvel {id_imovel} deletado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Imovel WHERE id_imovel = %s"
+        cursor.execute(sql, (id_imovel,))
+        conexao.commit()
+        print("\n✅ Imóvel deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar este imóvel porque ele está associado a Visitas, Anúncios, Documentos, Vendas ou Aluguéis!")
+    finally:
+        cursor.close()
+        conexao.close()

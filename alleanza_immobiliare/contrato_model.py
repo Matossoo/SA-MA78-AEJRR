@@ -1,3 +1,5 @@
+import mysql
+
 from database import conectar
 
 def listar_contratos():
@@ -53,52 +55,33 @@ def cadastrar_contrato(id_venda, id_aluguel, data_assinatura, clausulas):
     conexao.close()
 
 
-def atualizar_contrato(id_contrato,id_venda,id_aluguel,data_assinatura,clausulas):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    UPDATE Contrato
-    SET
-        id_venda=%s,
-        id_aluguel=%s,
-        data_assinatura=%s,
-        clausulas=%s
-    WHERE id_contrato=%s
-    """
-
-    valores = (
-        id_venda,
-        id_aluguel,
-        data_assinatura,
-        clausulas,
-        id_contrato
-    )
-
-    cursor.execute(sql,valores)
-    conexao.commit()
-
-    print("Contrato atualizado com sucesso!")
-
-    cursor.close()
-    conexao.close()
+def atualizar_contrato(id_contrato, id_venda, id_aluguel, data_assinatura, clausulas):
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = """UPDATE Contrato 
+                 SET id_venda=%s, id_aluguel=%s, data_assinatura=%s, clausulas=%s 
+                 WHERE id_contrato=%s"""
+        cursor.execute(sql, (id_venda, id_aluguel, data_assinatura, clausulas, id_contrato))
+        conexao.commit()
+        print("\n✅ Contrato atualizado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro: Verifique se os IDs da venda ou do aluguel associados existem!")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def deletar_contrato(id_contrato):
-
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    sql = """
-    DELETE FROM Contrato
-    WHERE id_contrato=%s
-    """
-
-    cursor.execute(sql,(id_contrato,))
-    conexao.commit()
-
-    print("Contrato removido com sucesso!")
-
-    cursor.close()
-    conexao.close()
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "DELETE FROM Contrato WHERE id_contrato = %s"
+        cursor.execute(sql, (id_contrato,))
+        conexao.commit()
+        print("\n✅ Contrato deletado com sucesso!")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Não é possível deletar este contrato porque constam Pagamentos registrados para ele!")
+    finally:
+        cursor.close()
+        conexao.close()
