@@ -46,6 +46,8 @@ SA-MA78-AEJRR/
 │   ├── imovel_documento_model.py  # CRUD de Imóvel Documento
 │   ├── anuncio_model.py           # CRUD de Anúncio
 │   ├── foto_imovel_model.py       # CRUD de Foto Imóvel
+│   ├── relatorio_model.py         # Exportação de relatórios (Excel/PDF)
+│   ├── requirements.txt           # Dependências Python do projeto
 │   └── .env.example               # Modelo de variáveis de ambiente
 ├── BancoDeDados/                   # Scripts SQL do banco de dados
 │   ├── 01_Criacao_Banco.sql        # Criação do banco de dados
@@ -83,7 +85,8 @@ cd SA-MA78-AEJRR
 ### 2. Instale as dependências
 
 ```bash
-pip install mysql-connector-python python-dotenv
+cd alleanza_immobiliare
+pip install -r requirements.txt
 ```
 
 ### 3. Configure o banco de dados

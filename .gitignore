@@ -1,0 +1,21 @@
+# Ambiente / segredos
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Relatórios gerados (não são artefatos de código-fonte)
+alleanza_immobiliare/Relatorio_Corretores.xlsx
+alleanza_immobiliare/Relatorio_Corretores.pdf
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store

@@ -1,913 +1,303 @@
-from endereco_model import *
-from proprietario_model import *
-from cliente_model import *
-from corretor_model import *
-from tipo_imovel_model import *
-from documento_model import *
-from imovel_model import *
-from visita_model import *
-from venda_model import *
-from aluguel_model import *
-from contrato_model import *
-from pagamento_model import *
-from imovel_documento_model import *
-from anuncio_model import *
-from foto_imovel_model import *
-from relatorio_model import *
+"""
+Alleanza Immobiliare - Menu principal (ponto de entrada)
 
-while True:
+Este arquivo foi reorganizado para eliminar duplicação: cada entidade descreve
+seus campos uma única vez em ENTIDADES, e um único submenu genérico (`submenu`)
+cuida de Listar/Cadastrar/Atualizar/Deletar para todas elas. O comportamento
+para o usuário final (textos, ordem das perguntas, opções de cada menu) foi
+mantido igual ao original, exceto pelas correções de bugs descritas no
+CHANGELOG do projeto (campos que main.py pedia na ordem errada ou incompleta
+para Contrato, Imóvel Documento, Anúncio e Foto Imóvel).
+"""
 
-    print("\n========================================")
-    print("      ALLEANZA IMMOBILIARE")
-    print("========================================")
-    print("1  - Endereço")
-    print("2  - Proprietário")
-    print("3  - Cliente")
-    print("4  - Corretor")
-    print("5  - Tipo de Imóvel")
-    print("6  - Documento")
-    print("7  - Imóvel")
-    print("8  - Visita")
-    print("9  - Venda")
-    print("10 - Aluguel")
-    print("11 - Contrato")
-    print("12 - Pagamento")
-    print("13 - Imóvel Documento")
-    print("14 - Anúncio")
-    print("15 - Foto Imóvel")
-    print("16 - Gerar Relatórios 📊")  # <-- NOVA OPÇÃO ADICIONADA AQUI!
-    print("0  - Sair")
+from endereco_model import listar_enderecos, cadastrar_endereco, atualizar_endereco, deletar_endereco
+from proprietario_model import listar_proprietarios, cadastrar_proprietario, atualizar_proprietario, deletar_proprietario
+from cliente_model import listar_clientes, cadastrar_cliente, atualizar_cliente, deletar_cliente
+from corretor_model import listar_corretores, cadastrar_corretor, atualizar_corretor, deletar_corretor
+from tipo_imovel_model import listar_tipos_imovel, cadastrar_tipo_imovel, atualizar_tipo_imovel, deletar_tipo_imovel
+from documento_model import listar_documentos, cadastrar_documento, atualizar_documento, deletar_documento
+from imovel_model import listar_imoveis, cadastrar_imovel, atualizar_imovel, deletar_imovel
+from visita_model import listar_visitas, cadastrar_visita, atualizar_visita, deletar_visita
+from venda_model import listar_vendas, cadastrar_venda, atualizar_venda, deletar_venda
+from aluguel_model import listar_alugueis, cadastrar_aluguel, atualizar_aluguel, deletar_aluguel
+from contrato_model import listar_contratos, cadastrar_contrato, atualizar_contrato, deletar_contrato
+from pagamento_model import listar_pagamentos, cadastrar_pagamento, atualizar_pagamento, deletar_pagamento
+from imovel_documento_model import listar_imovel_documentos, cadastrar_imovel_documento, atualizar_imovel_documento, deletar_imovel_documento
+from anuncio_model import listar_anuncios, cadastrar_anuncio, atualizar_anuncio, deletar_anuncio
+from foto_imovel_model import listar_fotos, cadastrar_foto, atualizar_foto, deletar_foto
+from relatorio_model import exportar_corretores_excel, exportar_corretores_pdf
 
-    opcao = input("\nEscolha uma opção: ")
 
-    if opcao == "0":
-        print("Sistema encerrado.")
-        break
+def ler_campo(rotulo, tipo="str"):
+    """Lê um campo do teclado e converte para o tipo pedido."""
+    valor = input(f"{rotulo}: ")
 
-#==================================================
-# ENDEREÇO
-#==================================================
+    if tipo == "int":
+        return int(valor)
+    if tipo == "float":
+        return float(valor)
+    if tipo == "int_opcional":
+        # Usado em campos que podem ficar em branco (ex.: FK opcional)
+        return int(valor) if valor.strip() else None
+    if tipo == "bool_sn":
+        return 1 if valor.strip().upper() == "S" else 0
 
-    elif opcao == "1":
+    return valor
 
-        while True:
 
-            print("\n===== ENDEREÇO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
+def ler_campos(campos):
+    """Lê uma lista de campos [(rotulo, tipo), ...] e retorna os valores na ordem."""
+    return [ler_campo(rotulo, tipo) for rotulo, tipo in campos]
+
+
+# ==========================================================================
+# Cada entidade descreve: título, função de listar, campos (na ordem exata
+# esperada pelas funções de cadastrar/atualizar do respectivo *_model.py),
+# e as funções de cadastrar/atualizar/deletar.
+# `atualizar` pode ser None quando a entidade não oferece essa opção.
+# ==========================================================================
+ENTIDADES = {
+    "1": {
+        "titulo": "ENDEREÇO",
+        "listar": listar_enderecos,
+        "campos": [("Rua", "str"), ("Número", "str"), ("Bairro", "str"),
+                   ("Cidade", "str"), ("Estado", "str"), ("CEP", "str")],
+        "cadastrar": cadastrar_endereco,
+        "atualizar": atualizar_endereco,
+        "deletar": deletar_endereco,
+        "id_rotulo": "ID",
+    },
+    "2": {
+        "titulo": "PROPRIETÁRIO",
+        "listar": listar_proprietarios,
+        "campos": [("Nome", "str"), ("CPF/CNPJ", "str"), ("Telefone", "str"), ("Email", "str")],
+        "cadastrar": cadastrar_proprietario,
+        "atualizar": atualizar_proprietario,
+        "deletar": deletar_proprietario,
+        "id_rotulo": "ID",
+    },
+    "3": {
+        "titulo": "CLIENTE",
+        "listar": listar_clientes,
+        "campos": [("Nome", "str"), ("CPF", "str"), ("Telefone", "str"), ("Email", "str")],
+        "cadastrar": cadastrar_cliente,
+        "atualizar": atualizar_cliente,
+        "deletar": deletar_cliente,
+        "id_rotulo": "ID",
+    },
+    "4": {
+        "titulo": "CORRETOR",
+        "listar": listar_corretores,
+        "campos": [("Nome", "str"), ("CRECI", "str"), ("Telefone", "str"), ("Email", "str")],
+        "cadastrar": cadastrar_corretor,
+        "atualizar": atualizar_corretor,
+        "deletar": deletar_corretor,
+        "id_rotulo": "ID",
+    },
+    "5": {
+        "titulo": "TIPO DE IMÓVEL",
+        "listar": listar_tipos_imovel,
+        "campos": [("Descrição", "str")],
+        "cadastrar": cadastrar_tipo_imovel,
+        "atualizar": atualizar_tipo_imovel,
+        "deletar": deletar_tipo_imovel,
+        "id_rotulo": "ID",
+    },
+    "6": {
+        "titulo": "DOCUMENTO",
+        "listar": listar_documentos,
+        "campos": [("Nome do documento", "str"), ("Tipo", "str")],
+        "cadastrar": cadastrar_documento,
+        "atualizar": atualizar_documento,
+        "deletar": deletar_documento,
+        "id_rotulo": "ID",
+    },
+    "7": {
+        "titulo": "IMÓVEL",
+        "listar": listar_imoveis,
+        "campos": [("ID Proprietário", "int"), ("ID Tipo Imóvel", "int"), ("ID Endereço", "int"),
+                   ("Valor sugerido", "float"), ("Status", "str")],
+        "cadastrar": cadastrar_imovel,
+        "atualizar": atualizar_imovel,
+        "deletar": deletar_imovel,
+        "id_rotulo": "ID Imóvel",
+    },
+    "8": {
+        "titulo": "VISITA",
+        "listar": listar_visitas,
+        "campos": [("ID Cliente", "int"), ("ID Corretor", "int"), ("ID Imóvel", "int"),
+                   ("Data e Hora (AAAA-MM-DD HH:MM:SS)", "str"), ("Observações", "str")],
+        "cadastrar": cadastrar_visita,
+        "atualizar": atualizar_visita,
+        "deletar": deletar_visita,
+        "id_rotulo": "ID Visita",
+    },
+    "9": {
+        "titulo": "VENDA",
+        "listar": listar_vendas,
+        "campos": [("ID Cliente", "int"), ("ID Corretor", "int"), ("ID Imóvel", "int"),
+                   ("Data da Venda (AAAA-MM-DD)", "str"), ("Valor da Venda", "float")],
+        "cadastrar": cadastrar_venda,
+        "atualizar": atualizar_venda,
+        "deletar": deletar_venda,
+        "id_rotulo": "ID Venda",
+    },
+    "10": {
+        "titulo": "ALUGUEL",
+        "listar": listar_alugueis,
+        "campos": [("ID Cliente", "int"), ("ID Corretor", "int"), ("ID Imóvel", "int"),
+                   ("Data de Início (AAAA-MM-DD)", "str"), ("Valor do Aluguel", "float")],
+        "cadastrar": cadastrar_aluguel,
+        "atualizar": atualizar_aluguel,
+        "deletar": deletar_aluguel,
+        "id_rotulo": "ID Aluguel",
+    },
+    # --- CORRIGIDO: main.py pedia (id_cliente, id_imovel, tipo, data), mas
+    # cadastrar_contrato/atualizar_contrato esperam
+    # (id_venda, id_aluguel, data_assinatura, clausulas). Um contrato é de
+    # venda OU de aluguel, então id_venda/id_aluguel são opcionais (o campo
+    # pode ficar em branco no banco).
+    "11": {
+        "titulo": "CONTRATO",
+        "listar": listar_contratos,
+        "campos": [("ID Venda (Enter se não houver)", "int_opcional"),
+                   ("ID Aluguel (Enter se não houver)", "int_opcional"),
+                   ("Data de Assinatura (AAAA-MM-DD)", "str"), ("Cláusulas", "str")],
+        "cadastrar": cadastrar_contrato,
+        "atualizar": atualizar_contrato,
+        "deletar": deletar_contrato,
+        "id_rotulo": "ID Contrato",
+    },
+    "12": {
+        "titulo": "PAGAMENTO",
+        "listar": listar_pagamentos,
+        "campos": [("ID Contrato", "int"), ("Valor", "float"),
+                   ("Data pagamento (AAAA-MM-DD)", "str"), ("Método pagamento", "str")],
+        "cadastrar": cadastrar_pagamento,
+        "atualizar": atualizar_pagamento,
+        "deletar": deletar_pagamento,
+        "id_rotulo": "ID Pagamento",
+    },
+    # --- CORRIGIDO: main.py não pedia "Data de arquivamento", então a
+    # chamada a cadastrar_imovel_documento() faltava um argumento obrigatório
+    # e quebrava em tempo de execução. Também foi exposta a opção de
+    # Atualizar, que já existia em imovel_documento_model.py mas não estava
+    # ligada a nenhum menu.
+    "13": {
+        "titulo": "IMÓVEL DOCUMENTO",
+        "listar": listar_imovel_documentos,
+        "campos": [("ID Imóvel", "int"), ("ID Documento", "int"),
+                   ("Data de arquivamento (AAAA-MM-DD)", "str")],
+        "cadastrar": cadastrar_imovel_documento,
+        "atualizar": atualizar_imovel_documento,
+        "deletar": deletar_imovel_documento,
+        "id_rotulo": "ID Imóvel Documento",
+    },
+    # --- CORRIGIDO: main.py não pedia "Título", campo obrigatório
+    # (NOT NULL) em Anuncio; a chamada original quebrava em tempo de
+    # execução.
+    "14": {
+        "titulo": "ANÚNCIO",
+        "listar": listar_anuncios,
+        "campos": [("ID Imóvel", "int"), ("Título", "str"),
+                   ("Descrição", "str"), ("Data de publicação (AAAA-MM-DD)", "str")],
+        "cadastrar": cadastrar_anuncio,
+        "atualizar": atualizar_anuncio,
+        "deletar": deletar_anuncio,
+        "id_rotulo": "ID Anúncio",
+    },
+    # --- CORRIGIDO: main.py pedia (id_imovel, caminho), mas
+    # cadastrar_foto/atualizar_foto esperam (id_anuncio, url_foto,
+    # principal) -- FotoImovel se relaciona com Anuncio, não diretamente com
+    # Imovel. Também foi exposta a opção de Atualizar (já existente no
+    # model, mas não ligada a nenhum menu).
+    "15": {
+        "titulo": "FOTO IMÓVEL",
+        "listar": listar_fotos,
+        "campos": [("ID Anúncio", "int"), ("URL/Caminho da foto", "str"),
+                   ("É a foto principal? (S/N)", "bool_sn")],
+        "cadastrar": cadastrar_foto,
+        "atualizar": atualizar_foto,
+        "deletar": deletar_foto,
+        "id_rotulo": "ID Foto",
+    },
+}
+
+
+def submenu(entidade):
+    """Submenu genérico de Listar/Cadastrar/Atualizar/Deletar para uma entidade."""
+    while True:
+        print(f"\n===== {entidade['titulo']} =====")
+        print("1 - Listar")
+        print("2 - Cadastrar")
+        if entidade["atualizar"]:
             print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_enderecos()
-
-            elif escolha == "2":
-
-                rua = input("Rua: ")
-                numero = input("Número: ")
-                bairro = input("Bairro: ")
-                cidade = input("Cidade: ")
-                estado = input("Estado: ")
-                cep = input("CEP: ")
-
-                cadastrar_endereco(
-                    rua,
-                    numero,
-                    bairro,
-                    cidade,
-                    estado,
-                    cep
-                )
-
-            elif escolha == "3":
-
-                id_endereco = int(input("ID: "))
-                rua = input("Rua: ")
-                numero = input("Número: ")
-                bairro = input("Bairro: ")
-                cidade = input("Cidade: ")
-                estado = input("Estado: ")
-                cep = input("CEP: ")
-
-                atualizar_endereco(
-                    id_endereco,
-                    rua,
-                    numero,
-                    bairro,
-                    cidade,
-                    estado,
-                    cep
-                )
-
-            elif escolha == "4":
-
-                id_endereco = int(input("ID: "))
-
-                deletar_endereco(id_endereco)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# PROPRIETÁRIO
-#==================================================
-
-    elif opcao == "2":
-
-        while True:
-
-            print("\n===== PROPRIETÁRIO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_proprietarios()
-
-            elif escolha == "2":
-
-                nome = input("Nome: ")
-                cpf = input("CPF/CNPJ: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                cadastrar_proprietario(
-                    nome,
-                    cpf,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "3":
-
-                id_proprietario = int(input("ID: "))
-                nome = input("Nome: ")
-                cpf = input("CPF/CNPJ: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                atualizar_proprietario(
-                    id_proprietario,
-                    nome,
-                    cpf,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "4":
-
-                id_proprietario = int(input("ID: "))
-
-                deletar_proprietario(id_proprietario)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# CLIENTE
-#==================================================
-
-    elif opcao == "3":
-
-        while True:
-
-            print("\n===== CLIENTE =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_clientes()
-
-            elif escolha == "2":
-
-                nome = input("Nome: ")
-                cpf = input("CPF: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                cadastrar_cliente(
-                    nome,
-                    cpf,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "3":
-
-                id_cliente = int(input("ID: "))
-                nome = input("Nome: ")
-                cpf = input("CPF: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                atualizar_cliente(
-                    id_cliente,
-                    nome,
-                    cpf,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "4":
-
-                id_cliente = int(input("ID: "))
-
-                deletar_cliente(id_cliente)
-
-            elif escolha == "0":
-                break
-            #==================================================
-# CORRETOR
-#==================================================
-
-    elif opcao == "4":
-
-        while True:
-
-            print("\n===== CORRETOR =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_corretores()
-
-            elif escolha == "2":
-
-                nome = input("Nome: ")
-                creci = input("CRECI: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                cadastrar_corretor(
-                    nome,
-                    creci,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "3":
-
-                id_corretor = int(input("ID: "))
-                nome = input("Nome: ")
-                creci = input("CRECI: ")
-                telefone = input("Telefone: ")
-                email = input("Email: ")
-
-                atualizar_corretor(
-                    id_corretor,
-                    nome,
-                    creci,
-                    telefone,
-                    email
-                )
-
-            elif escolha == "4":
-
-                id_corretor = int(input("ID: "))
-                deletar_corretor(id_corretor)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# TIPO DE IMÓVEL
-#==================================================
-
-    elif opcao == "5":
-
-        while True:
-
-            print("\n===== TIPO DE IMÓVEL =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_tipos_imovel()
-
-            elif escolha == "2":
-
-                descricao = input("Descrição: ")
-
-                cadastrar_tipo_imovel(descricao)
-
-            elif escolha == "3":
-
-                id_tipo = int(input("ID: "))
-                descricao = input("Descrição: ")
-
-                atualizar_tipo_imovel(
-                    id_tipo,
-                    descricao
-                )
-
-            elif escolha == "4":
-
-                id_tipo = int(input("ID: "))
-                deletar_tipo_imovel(id_tipo)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# DOCUMENTO
-#==================================================
-
-    elif opcao == "6":
-
-        while True:
-
-            print("\n===== DOCUMENTO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_documentos()
-
-            elif escolha == "2":
-
-                nome = input("Nome do documento: ")
-                tipo = input("Tipo: ")
-
-                cadastrar_documento(
-                    nome,
-                    tipo
-                )
-
-            elif escolha == "3":
-
-                id_documento = int(input("ID: "))
-                nome = input("Nome do documento: ")
-                tipo = input("Tipo: ")
-
-                atualizar_documento(
-                    id_documento,
-                    nome,
-                    tipo
-                )
-
-            elif escolha == "4":
-
-                id_documento = int(input("ID: "))
-                deletar_documento(id_documento)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# IMÓVEL
-#==================================================
-
-    elif opcao == "7":
-
-        while True:
-
-            print("\n===== IMÓVEL =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_imoveis()
-
-            elif escolha == "2":
-
-                id_proprietario = int(input("ID Proprietário: "))
-                id_tipo = int(input("ID Tipo Imóvel: "))
-                id_endereco = int(input("ID Endereço: "))
-                valor = float(input("Valor sugerido: "))
-                status = input("Status: ")
-
-                cadastrar_imovel(
-                    id_proprietario,
-                    id_tipo,
-                    id_endereco,
-                    valor,
-                    status
-                )
-
-            elif escolha == "3":
-
-                id_imovel = int(input("ID Imóvel: "))
-                id_proprietario = int(input("ID Proprietário: "))
-                id_tipo = int(input("ID Tipo Imóvel: "))
-                id_endereco = int(input("ID Endereço: "))
-                valor = float(input("Valor sugerido: "))
-                status = input("Status: ")
-
-                atualizar_imovel(
-                    id_imovel,
-                    id_proprietario,
-                    id_tipo,
-                    id_endereco,
-                    valor,
-                    status
-                )
-
-            elif escolha == "4":
-
-                id_imovel = int(input("ID Imóvel: "))
-                deletar_imovel(id_imovel)
-
-            elif escolha == "0":
-                break
-            #==================================================
-# VISITA
-#==================================================
-
-    elif opcao == "8":
-
-        while True:
-
-            print("\n===== VISITA =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_visitas()
-
-            elif escolha == "2":
-
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data e Hora (AAAA-MM-DD HH:MM:SS): ")
-                observacoes = input("Observações: ")
-
-                cadastrar_visita(
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    observacoes
-                )
-
-            elif escolha == "3":
-
-                id_visita = int(input("ID Visita: "))
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data e Hora: ")
-                observacoes = input("Observações: ")
-
-                atualizar_visita(
-                    id_visita,
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    observacoes
-                )
-
-            elif escolha == "4":
-
-                id_visita = int(input("ID Visita: "))
-                deletar_visita(id_visita)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# VENDA
-#==================================================
-
-    elif opcao == "9":
-
-        while True:
-
-            print("\n===== VENDA =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_vendas()
-
-            elif escolha == "2":
-
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data da Venda (AAAA-MM-DD): ")
-                valor = float(input("Valor da Venda: "))
-
-                cadastrar_venda(
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    valor
-                )
-
-            elif escolha == "3":
-
-                id_venda = int(input("ID Venda: "))
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data da Venda: ")
-                valor = float(input("Valor da Venda: "))
-
-                atualizar_venda(
-                    id_venda,
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    valor
-                )
-
-            elif escolha == "4":
-
-                id_venda = int(input("ID Venda: "))
-                deletar_venda(id_venda)
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# ALUGUEL
-#==================================================
-
-    elif opcao == "10":
-
-        while True:
-
-            print("\n===== ALUGUEL =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_alugueis()
-
-            elif escolha == "2":
-
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data de Início (AAAA-MM-DD): ")
-                valor = float(input("Valor do Aluguel: "))
-
-                cadastrar_aluguel(
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    valor
-                )
-
-            elif escolha == "3":
-
-                id_aluguel = int(input("ID Aluguel: "))
-                id_cliente = int(input("ID Cliente: "))
-                id_corretor = int(input("ID Corretor: "))
-                id_imovel = int(input("ID Imóvel: "))
-                data = input("Data de Início: ")
-                valor = float(input("Valor do Aluguel: "))
-
-                atualizar_aluguel(
-                    id_aluguel,
-                    id_cliente,
-                    id_corretor,
-                    id_imovel,
-                    data,
-                    valor
-                )
-
-            elif escolha == "4":
-
-                id_aluguel = int(input("ID Aluguel: "))
-                deletar_aluguel(id_aluguel)
-
-            elif escolha == "0":
-                break
-            #==================================================
-# CONTRATO
-#==================================================
-
-    elif opcao == "11":
-
-        while True:
-
-            print("\n===== CONTRATO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_contratos()
-
-            elif escolha == "2":
-
-                id_cliente = int(input("ID Cliente: "))
-                id_imovel = int(input("ID Imóvel: "))
-                tipo = input("Tipo contrato: ")
-                data = input("Data (AAAA-MM-DD): ")
-
-                cadastrar_contrato(
-                    id_cliente,
-                    id_imovel,
-                    tipo,
-                    data
-                )
-
-            elif escolha == "3":
-
-                id_contrato = int(input("ID Contrato: "))
-                id_cliente = int(input("ID Cliente: "))
-                id_imovel = int(input("ID Imóvel: "))
-                tipo = input("Tipo contrato: ")
-                data = input("Data: ")
-
-                atualizar_contrato(
-                    id_contrato,
-                    id_cliente,
-                    id_imovel,
-                    tipo,
-                    data
-                )
-
-            elif escolha == "4":
-
-                id_contrato = int(input("ID Contrato: "))
-                deletar_contrato(id_contrato)
-
-            elif escolha == "0":
-                break
-
-
-#==================================================
-# PAGAMENTO
-#==================================================
-
-    elif opcao == "12":
-
-        while True:
-
-            print("\n===== PAGAMENTO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-            if escolha == "1":
-                listar_pagamentos()
-
-            elif escolha == "2":
-
-                id_contrato = int(input("ID Contrato: "))
-                valor = float(input("Valor: "))
-                data = input("Data pagamento: ")
-                metodo = input("Método pagamento: ")
-
-                cadastrar_pagamento(
-                    id_contrato,
-                    valor,
-                    data,
-                    metodo
-                )
-
-            elif escolha == "3":
-
-                id_pagamento = int(input("ID Pagamento: "))
-                id_contrato = int(input("ID Contrato: "))
-                valor = float(input("Valor: "))
-                data = input("Data: ")
-                metodo = input("Método: ")
-
-                atualizar_pagamento(
-                    id_pagamento,
-                    id_contrato,
-                    valor,
-                    data,
-                    metodo
-                )
-
-            elif escolha == "4":
-
-                id_pagamento = int(input("ID Pagamento: "))
-                deletar_pagamento(id_pagamento)
-
-            elif escolha == "0":
-                break
-
-
-
-#==================================================
-# IMÓVEL DOCUMENTO
-#==================================================
-
-    elif opcao == "13":
-
-        while True:
-
-            print("\n===== IMÓVEL DOCUMENTO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-
-            if escolha == "1":
-                listar_imovel_documentos()
-
-
-            elif escolha == "2":
-
-                id_imovel = int(input("ID Imóvel: "))
-                id_documento = int(input("ID Documento: "))
-
-                cadastrar_imovel_documento(
-                    id_imovel,
-                    id_documento
-                )
-
-
-            elif escolha == "3":
-
-                id = int(input("ID: "))
-
-                deletar_imovel_documento(id)
-
-
-            elif escolha == "0":
-                break
-
-
-
-#==================================================
-# ANÚNCIO
-#==================================================
-
-    elif opcao == "14":
-
-        while True:
-
-            print("\n===== ANÚNCIO =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Atualizar")
-            print("4 - Deletar")
-            print("0 - Voltar")
-
-            escolha = input("Escolha: ")
-
-
-            if escolha == "1":
-                listar_anuncios()
-
-
-            elif escolha == "2":
-
-                id_imovel = int(input("ID Imóvel: "))
-                descricao = input("Descrição: ")
-                data = input("Data anúncio: ")
-
-                cadastrar_anuncio(
-                    id_imovel,
-                    descricao,
-                    data
-                )
-
-
-            elif escolha == "3":
-
-                id_anuncio = int(input("ID Anúncio: "))
-                descricao = input("Descrição: ")
-                data = input("Data: ")
-
-                atualizar_anuncio(
-                    id_anuncio,
-                    descricao,
-                    data
-                )
-
-
-            elif escolha == "4":
-
-                id_anuncio = int(input("ID Anúncio: "))
-
-                deletar_anuncio(id_anuncio)
-
-
-            elif escolha == "0":
-                break
-
-
-
-#==================================================
-# FOTO IMÓVEL
-#==================================================
-
-    elif opcao == "15":
-
-        while True:
-
-            print("\n===== FOTO IMÓVEL =====")
-            print("1 - Listar")
-            print("2 - Cadastrar")
-            print("3 - Deletar")
-            print("0 - Voltar")
-
-
-            escolha = input("Escolha: ")
-
-
-            if escolha == "1":
-
-                listar_fotos()
-
-
-            elif escolha == "2":
-
-                id_imovel = int(input("ID Imóvel: "))
-                caminho = input("Caminho da foto: ")
-
-                cadastrar_foto(
-                    id_imovel,
-                    caminho
-                )
-
-
-            elif escolha == "3":
-
-                id_foto = int(input("ID Foto: "))
-
-                deletar_foto(id_foto)
-
-
-            elif escolha == "0":
-                break
-
-#==================================================
-# GERAÇÃO DE RELATÓRIOS (NOVO BLOCO NO FINAL)
-#==================================================
-    elif opcao == "16":
-        while True:
-            print("\n===== CENTRAL DE RELATÓRIOS 📊 =====")
-            print("1 - Exportar Corretores para Excel (.xlsx)")
-            print("2 - Exportar Corretores para PDF (.pdf)")
-            print("0 - Voltar ao Menu Principal")
-
-            escolha_relatorio = input("Escolha: ")
-
-            if escolha_relatorio == "1":
-                exportar_corretores_excel()
-            elif escolha_relatorio == "2":
-                exportar_corretores_pdf()
-            elif escolha_relatorio == "0":
-                break
+        print("4 - Deletar")
+        print("0 - Voltar")
+
+        escolha = input("Escolha: ")
+
+        if escolha == "1":
+            entidade["listar"]()
+
+        elif escolha == "2":
+            valores = ler_campos(entidade["campos"])
+            entidade["cadastrar"](*valores)
+
+        elif escolha == "3" and entidade["atualizar"]:
+            id_valor = ler_campo(entidade["id_rotulo"], "int")
+            valores = ler_campos(entidade["campos"])
+            entidade["atualizar"](id_valor, *valores)
+
+        elif escolha == "4":
+            id_valor = ler_campo(entidade["id_rotulo"], "int")
+            entidade["deletar"](id_valor)
+
+        elif escolha == "0":
+            break
+
+
+def menu_relatorios():
+    while True:
+        print("\n===== CENTRAL DE RELATÓRIOS 📊 =====")
+        print("1 - Exportar Corretores para Excel (.xlsx)")
+        print("2 - Exportar Corretores para PDF (.pdf)")
+        print("0 - Voltar ao Menu Principal")
+
+        escolha = input("Escolha: ")
+
+        if escolha == "1":
+            exportar_corretores_excel()
+        elif escolha == "2":
+            exportar_corretores_pdf()
+        elif escolha == "0":
+            break
+
+
+def menu_principal():
+    opcoes_titulos = [(num, e["titulo"].title()) for num, e in ENTIDADES.items()]
+
+    while True:
+        print("\n========================================")
+        print("      ALLEANZA IMMOBILIARE")
+        print("========================================")
+        for num, titulo in opcoes_titulos:
+            print(f"{num:<2} - {titulo}")
+        print("16 - Gerar Relatórios 📊")
+        print("0  - Sair")
+
+        opcao = input("\nEscolha uma opção: ")
+
+        if opcao == "0":
+            print("Sistema encerrado.")
+            break
+        elif opcao == "16":
+            menu_relatorios()
+        elif opcao in ENTIDADES:
+            submenu(ENTIDADES[opcao])
+        else:
+            print("\n❌ Opção inválida.")
+
+
+if __name__ == "__main__":
+    menu_principal()
