@@ -167,6 +167,10 @@ O banco relacional conecta as principais entidades do negócio imobiliário:
 
 Os scripts completos de criação de tabelas, relacionamentos (chaves estrangeiras) e views estão disponíveis na pasta `BancoDeDados/`.
 
+## 🎨 Mockup
+
+Um mockup de como o sistema poderia ganhar uma interface web está em `docs/mockup.html`. Basta abrir o arquivo em qualquer navegador — não depende do backend Python nem do banco de dados, é só a interface visual.
+
 ## 📄 Licença
 
 Projeto acadêmico/demonstrativo — sem licença específica definida.
