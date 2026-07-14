@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alleanza Immobiliare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone:#EDE8DC; --paper:#FBF9F3; --ink:#23281F; --ink-soft:#4B5245;
+    --villa:#2C3E32; --villa-deep:#1F2E25; --brass:#B8863E; --brass-deep:#8C6526;
+    --rust:#A6432E; --line:#D9D1BC; --text-2:#6E6858; --ok:#3B6D11;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--stone);color:var(--ink);font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  .container{max-width:1120px;margin:0 auto;padding:0 2rem;}
+
+  /* Nav */
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.5rem 0;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:38px;height:38px;flex-shrink:0;}
+  .brand .word .name{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:19px;line-height:1;}
+  .brand .word .sub{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass-deep);margin-top:2px;}
+  .navlinks{display:flex;gap:2rem;font-size:14px;}
+  .navlinks a{text-decoration:none;color:var(--ink-soft);}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--villa);color:var(--paper);
+    padding:10px 20px;border-radius:24px;
+    font-size:13.5px;font-weight:500;text-decoration:none;
+    border:none;cursor:pointer;
+  }
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);}
+
+  /* Hero */
+  .hero{
+    padding:3.5rem 0 4rem;
+    display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;
+  }
+  .hero .kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass-deep);margin-bottom:1rem;}
+  .hero h1{font-family:'Fraunces',serif;font-weight:500;font-size:46px;line-height:1.08;margin:0 0 1.1rem;}
+  .hero p{font-size:15.5px;color:var(--ink-soft);max-width:440px;line-height:1.6;margin-bottom:1.75rem;}
+  .hero-visual{
+    background:var(--villa);border-radius:16px;
+    aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+  }
+
+  .filterbar{
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:1.1rem;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.75rem;
+  }
+  .filterbar select, .filterbar input{
+    border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-family:'Work Sans',sans-serif;font-size:13.5px;background:var(--stone);color:var(--ink);
+  }
+  .filterbar button{border-radius:8px;}
+
+  /* Listings */
+  section.listings{padding:1rem 0 4rem;}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem;}
+  .section-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0;}
+  .section-head p{font-size:13.5px;color:var(--text-2);margin:0;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .card .photo{
+    position:relative;height:170px;background:var(--villa);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .badge{
+    position:absolute;top:12px;left:12px;
+    background:var(--paper);color:var(--ok);
+    font-size:11px;font-weight:500;letter-spacing:.03em;
+    padding:5px 12px;border-radius:14px;
+  }
+  .card .body{padding:1.2rem 1.3rem 1.3rem;}
+  .card .kind{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2);}
+  .card .addr{font-family:'Fraunces',serif;font-size:18px;font-weight:500;margin:4px 0 10px;}
+  .card .specs{display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);margin-bottom:14px;}
+  .card .price-row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:14px;}
+  .card .price{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:17px;color:var(--brass-deep);}
+  .card .price small{display:block;font-size:10.5px;color:var(--text-2);font-weight:400;}
+  .card .visit-btn{
+    font-size:12.5px;font-weight:500;color:var(--villa);
+    background:none;border:1px solid var(--villa);border-radius:20px;
+    padding:8px 14px;cursor:pointer;
+  }
+
+  /* Visit scheduling */
+  section.schedule{
+    background:var(--villa);color:var(--paper);
+    border-radius:20px;margin:1rem 2rem 4rem;
+    padding:3rem;display:grid;grid-template-columns:1fr 1.1fr;gap:3rem;
+  }
+  @media (min-width:1120px){ section.schedule{margin:1rem auto 4rem;max-width:1120px;} }
+  section.schedule .kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:1rem;}
+  section.schedule h2{font-family:'Fraunces',serif;font-weight:500;font-size:30px;margin:0 0 1rem;}
+  section.schedule p{font-size:14.5px;color:rgba(251,249,243,.75);line-height:1.6;max-width:380px;}
+  .form{display:flex;flex-direction:column;gap:.9rem;}
+  .form .row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+  .form label{font-size:12px;color:rgba(251,249,243,.7);display:block;margin-bottom:5px;}
+  .form input, .form select, .form textarea{
+    width:100%;background:rgba(251,249,243,.08);border:1px solid rgba(251,249,243,.22);
+    border-radius:8px;padding:11px 12px;color:var(--paper);
+    font-family:'Work Sans',sans-serif;font-size:13.5px;outline:none;
+  }
+  .form textarea{resize:vertical;min-height:64px;}
+  .form input::placeholder, .form textarea::placeholder{color:rgba(251,249,243,.4);}
+  .form .submit{
+    margin-top:6px;background:var(--brass);color:var(--villa-deep);
+    border:none;border-radius:24px;padding:12px 22px;font-weight:500;font-size:14px;cursor:pointer;
+    align-self:flex-start;
+  }
+
+  footer{padding:2.5rem 0 3rem;border-top:1px solid var(--line);}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .foot-inner .small{font-size:12px;color:var(--text-2);font-family:'IBM Plex Mono',monospace;}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;}
+    .filterbar{grid-template-columns:1fr;}
+    section.schedule{grid-template-columns:1fr;margin:1rem 1rem 3rem;padding:2rem;}
+    .form .row{grid-template-columns:1fr;}
+    .navlinks{display:none;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="nav">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="92" fill="#2C3E32" stroke="#B8863E" stroke-width="4"/>
+          <path d="M68 142 V100 A32 32 0 0 1 132 100 V142" fill="none" stroke="#B8863E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="54" y1="142" x2="146" y2="142" stroke="#B8863E" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="100" cy="66" r="5" fill="#B8863E"/>
+        </svg>
+        <div class="word"><div class="name">Alleanza</div><div class="sub">Immobiliare</div></div>
+      </div>
+      <div class="navlinks">
+        <a href="#imoveis">Imóveis</a>
+        <a href="#agendar">Agendar visita</a>
+        <a href="#contato">Contato</a>
+      </div>
+      <a class="btn" href="tel:+551130405060">Falar com um corretor</a>
+    </div>
+
+    <div class="hero">
+      <div>
+        <div class="kicker">Imóveis em São Paulo e região</div>
+        <h1>Encontre o próximo endereço da sua história</h1>
+        <p>Casas, apartamentos e terrenos selecionados por corretores CRECI. Agende uma visita em poucos minutos, sem burocracia.</p>
+        <div class="filterbar">
+          <select><option>Tipo de imóvel</option><option>Casa</option><option>Apartamento</option><option>Terreno</option></select>
+          <select><option>Bairro</option><option>Jardim Europa</option><option>Vila Toscana</option><option>Bela Vista</option></select>
+          <select><option>Faixa de preço</option><option>Até R$ 500 mil</option><option>R$ 500 mil – 1 mi</option><option>Acima de R$ 1 mi</option></select>
+          <button class="btn">Buscar</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <section class="listings" id="imoveis">
+      <div class="section-head">
+        <h2>Imóveis disponíveis</h2>
+        <p>18 resultados</p>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="photo">
+            <span class="badge">Disponível</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.2"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+          </div>
+          <div class="body">
+            <div class="kind">Casa · Jardim Europa</div>
+            <div class="addr">Rua das Oliveiras, 214</div>
+            <div class="specs"><span>180 m²</span><span>3 qts</span><span>2 vgs</span></div>
+            <div class="price-row">
+              <div class="price">R$ 890.000<small>à vista</small></div>
+              <button class="visit-btn">Agendar visita</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="photo">
+            <span class="badge">Disponível</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.2"><rect x="6" y="3" width="12" height="18"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/></svg>
+          </div>
+          <div class="body">
+            <div class="kind">Apartamento · Vila Toscana</div>
+            <div class="addr">Av. Genova, 88 · apto 704</div>
+            <div class="specs"><span>96 m²</span><span>2 qts</span><span>1 vg</span></div>
+            <div class="price-row">
+              <div class="price">R$ 540.000<small>à vista</small></div>
+              <button class="visit-btn">Agendar visita</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="photo">
+            <span class="badge">Disponível</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.2"><path d="M3 20h18"/><path d="M5 20 5 9l7-5 7 5v11"/><path d="M9 20v-7h6v7"/></svg>
+          </div>
+          <div class="body">
+            <div class="kind">Sobrado · Bela Vista</div>
+            <div class="addr">Rua Verona, 45</div>
+            <div class="specs"><span>140 m²</span><span>3 qts</span><span>2 vgs</span></div>
+            <div class="price-row">
+              <div class="price">R$ 4.200<small>por mês</small></div>
+              <button class="visit-btn">Agendar visita</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="photo">
+            <span class="badge">Disponível</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.2"><path d="M4 20h16M6 20V10l6-4 6 4v10"/></svg>
+          </div>
+          <div class="body">
+            <div class="kind">Terreno · Chácara das Rosas</div>
+            <div class="addr">Estrada do Vale, km 4</div>
+            <div class="specs"><span>500 m²</span><span>plano</span></div>
+            <div class="price-row">
+              <div class="price">R$ 310.000<small>à vista</small></div>
+              <button class="visit-btn">Agendar visita</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <section class="schedule" id="agendar">
+    <div>
+      <div class="kicker">Agendamento</div>
+      <h2>Vamos marcar sua visita</h2>
+      <p>Preencha os dados abaixo e um corretor confirma o horário com você em até 1 dia útil.</p>
+    </div>
+    <form class="form">
+      <div class="row">
+        <div><label for="nome">Nome</label><input id="nome" type="text" placeholder="Seu nome completo"></div>
+        <div><label for="tel">Telefone</label><input id="tel" type="tel" placeholder="(11) 90000-0000"></div>
+      </div>
+      <div>
+        <label for="imovel">Imóvel de interesse</label>
+        <select id="imovel">
+          <option>Rua das Oliveiras, 214 — Jardim Europa</option>
+          <option>Av. Genova, 88, apto 704 — Vila Toscana</option>
+          <option>Rua Verona, 45 — Bela Vista</option>
+          <option>Estrada do Vale, km 4 — Chácara das Rosas</option>
+        </select>
+      </div>
+      <div class="row">
+        <div><label for="data">Data preferida</label><input id="data" type="date"></div>
+        <div><label for="hora">Horário</label><input id="hora" type="time"></div>
+      </div>
+      <div>
+        <label for="msg">Mensagem (opcional)</label>
+        <textarea id="msg" placeholder="Alguma observação para o corretor?"></textarea>
+      </div>
+      <button type="button" class="submit">Solicitar visita</button>
+    </form>
+  </section>
+
+  <div class="container">
+    <footer id="contato">
+      <div class="foot-inner">
+        <div class="brand">
+          <svg class="mark" width="30" height="30" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="92" fill="none" stroke="#2C3E32" stroke-width="6"/>
+            <path d="M68 142 V100 A32 32 0 0 1 132 100 V142" fill="none" stroke="#2C3E32" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="54" y1="142" x2="146" y2="142" stroke="#2C3E32" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="100" cy="66" r="6" fill="#2C3E32"/>
+          </svg>
+          <div class="small">Av. Genova, 300 · São Paulo, SP · (11) 3040-5060</div>
+        </div>
+        <div class="small">© 2026 Alleanza Immobiliare — mockup</div>
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>

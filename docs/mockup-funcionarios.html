@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alleanza Immobiliare — Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone:#EDE8DC;
+    --paper:#FBF9F3;
+    --ink:#23281F;
+    --ink-soft:#4B5245;
+    --villa:#2C3E32;
+    --villa-deep:#1F2E25;
+    --brass:#B8863E;
+    --brass-deep:#8C6526;
+    --rust:#A6432E;
+    --line:#D9D1BC;
+    --text-2:#6E6858;
+    --ok:#3B6D11;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--stone);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .app{
+    display:grid;
+    grid-template-columns:240px 1fr;
+    min-height:100vh;
+  }
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    background:var(--villa);
+    color:var(--paper);
+    padding:2rem 1.25rem;
+    display:flex;
+    flex-direction:column;
+    gap:2.5rem;
+  }
+  .brand{
+    line-height:1.1;
+  }
+  .brand .name{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:24px;
+  }
+  .brand .sub{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-top:4px;
+  }
+  nav{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    flex:1;
+  }
+  .navitem{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border-radius:6px;
+    font-size:14px;
+    text-decoration:none;
+    color:rgba(251,249,243,.72);
+    border-left:2px solid transparent;
+  }
+  .navitem svg{flex-shrink:0;opacity:.85;}
+  .navitem.active{
+    background:rgba(251,249,243,.08);
+    color:var(--paper);
+    border-left:2px solid var(--brass);
+  }
+  .navitem:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
+  .agent{
+    border-top:1px solid rgba(251,249,243,.14);
+    padding-top:1.25rem;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .agent .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:var(--brass);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:500;font-size:14px;
+    color:var(--villa-deep);
+    flex-shrink:0;
+  }
+  .agent .who{font-size:13px;font-weight:500;}
+  .agent .role{font-size:11px;color:rgba(251,249,243,.6);font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- Main ---------- */
+  main{padding:2.5rem 3rem 4rem;}
+  header.top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    margin-bottom:2.25rem;
+    gap:1.5rem;
+    flex-wrap:wrap;
+  }
+  header.top h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:32px;
+    margin:0;
+  }
+  header.top .date{
+    font-size:13px;color:var(--text-2);
+    font-family:'IBM Plex Mono',monospace;
+    margin-top:4px;
+  }
+  .search{
+    display:flex;align-items:center;gap:8px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:9px 16px;
+    min-width:260px;
+  }
+  .search input{
+    border:none;background:none;outline:none;
+    font-family:'Work Sans',sans-serif;font-size:13px;
+    width:100%;color:var(--ink);
+  }
+  .search svg{opacity:.5;flex-shrink:0;}
+
+  /* KPI row */
+  .kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:1rem;
+    margin-bottom:3rem;
+  }
+  .kpi{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:1.1rem 1.25rem;
+  }
+  .kpi .label{
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-2);
+  }
+  .kpi .value{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:28px;margin-top:8px;
+  }
+  .kpi .delta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--ok);
+    margin-top:4px;
+  }
+
+  /* Section headers */
+  .section-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:1.1rem;
+  }
+  .section-head h2{
+    font-family:'Fraunces',serif;font-weight:500;font-size:19px;margin:0;
+  }
+  .section-head a{
+    font-size:13px;color:var(--brass-deep);text-decoration:none;
+    border-bottom:1px solid var(--brass-deep);
+  }
+
+  /* Property grid */
+  .properties{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:1.5rem;
+    margin-bottom:3rem;
+  }
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .card .visual{
+    position:relative;
+    background:var(--villa);
+    height:120px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .card .visual svg{opacity:.9;}
+  .stamp{
+    position:absolute;top:12px;right:12px;
+    width:64px;height:64px;
+    border:1.5px dashed var(--brass);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-9deg);
+    text-align:center;
+  }
+  .stamp span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:8.5px;letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--brass);
+    line-height:1.25;
+  }
+  .card .body{padding:1.1rem 1.25rem 1.25rem;}
+  .card .kind{
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-2);
+  }
+  .card .addr{
+    font-family:'Fraunces',serif;font-size:17px;font-weight:500;
+    margin:4px 0 10px;
+  }
+  .card .specs{
+    display:flex;gap:14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;color:var(--ink-soft);
+    margin-bottom:12px;
+  }
+  .card .specs span{display:flex;align-items:center;gap:4px;}
+  .card .price-row{
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);
+    padding-top:12px;
+  }
+  .card .price{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:500;font-size:15px;color:var(--brass-deep);
+  }
+  .card .view{
+    font-size:12px;color:var(--ink-soft);text-decoration:none;
+    border-bottom:1px solid var(--line);
+  }
+
+  /* Activity */
+  .activity{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:2rem;
+  }
+  .list{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+  }
+  .list .row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:.85rem 1.1rem;
+    border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .list .row:last-child{border-bottom:none;}
+  .list .row .when{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;color:var(--text-2);
+    min-width:64px;
+  }
+  .list .row .who{font-weight:500;}
+  .list .row .what{color:var(--text-2);font-size:12.5px;}
+  .list .row .amt{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;color:var(--ok);
+  }
+
+  footer.foot{
+    margin-top:3rem;
+    padding-top:1.25rem;
+    border-top:1px solid var(--line);
+    font-size:11.5px;
+    color:var(--text-2);
+    font-family:'IBM Plex Mono',monospace;
+    display:flex;justify-content:space-between;
+  }
+
+  @media (max-width:860px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{
+      flex-direction:row;align-items:center;justify-content:space-between;
+      padding:1rem 1.25rem;gap:1rem;
+    }
+    nav{flex-direction:row;overflow-x:auto;flex:none;}
+    .agent{border-top:none;padding-top:0;}
+    main{padding:1.5rem 1.25rem 3rem;}
+    .activity{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand" style="display:flex;align-items:center;gap:10px;">
+      <svg width="34" height="34" viewBox="0 0 200 200" style="flex-shrink:0;">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="#B8863E" stroke-width="6"/>
+        <path d="M68 142 V100 A32 32 0 0 1 132 100 V142" fill="none" stroke="#B8863E" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="54" y1="142" x2="146" y2="142" stroke="#B8863E" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="100" cy="66" r="7" fill="#B8863E"/>
+      </svg>
+      <div>
+        <div class="name">Alleanza</div>
+        <div class="sub">Immobiliare</div>
+      </div>
+    </div>
+
+    <nav>
+      <a class="navitem active" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="10" width="18" height="11"/><path d="M3 10 12 3l9 7"/></svg>Painel</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>Imóveis</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.4"/><path d="M5 21c1-4 4-6 7-6s6 2 7 6"/></svg>Clientes</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 21V7l8-4 8 4v14"/><path d="M9 21v-6h6v6"/></svg>Proprietários</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="7" r="3"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>Corretores</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/></svg>Contratos</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Vendas &amp; aluguéis</a>
+      <a class="navitem" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h4"/></svg>Relatórios</a>
+    </nav>
+
+    <div class="agent">
+      <div class="avatar">MB</div>
+      <div>
+        <div class="who">Marco Belini</div>
+        <div class="role">CRECI 48219-F</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="top">
+      <div>
+        <h1>Painel</h1>
+        <div class="date">Terça-feira, 14 de julho de 2026</div>
+      </div>
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Buscar imóvel, cliente ou contrato">
+      </div>
+    </header>
+
+    <section class="kpis">
+      <div class="kpi">
+        <div class="label">Imóveis ativos</div>
+        <div class="value">128</div>
+        <div class="delta">+6 este mês</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Vendas no mês</div>
+        <div class="value">R$ 2,4 mi</div>
+        <div class="delta">+12% vs. junho</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Visitas agendadas</div>
+        <div class="value">34</div>
+        <div class="delta">nos próximos 7 dias</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Contratos vigentes</div>
+        <div class="value">57</div>
+        <div class="delta">3 vencem este mês</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Imóveis em destaque</h2>
+        <a href="#">Ver todos</a>
+      </div>
+      <div class="properties">
+
+        <div class="card">
+          <div class="visual">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.3"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+            <div class="stamp"><span>Disponível</span></div>
+          </div>
+          <div class="body">
+            <div class="kind">Casa · Jardim Europa</div>
+            <div class="addr">Rua das Oliveiras, 214</div>
+            <div class="specs">
+              <span>180 m²</span><span>3 qts</span><span>2 vgs</span>
+            </div>
+            <div class="price-row">
+              <div class="price">R$ 890.000</div>
+              <a class="view" href="#">Ver detalhes</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="visual">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.3"><rect x="6" y="3" width="12" height="18"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/></svg>
+            <div class="stamp"><span>Vendido</span></div>
+          </div>
+          <div class="body">
+            <div class="kind">Apartamento · Vila Toscana</div>
+            <div class="addr">Av. Genova, 88 · apto 704</div>
+            <div class="specs">
+              <span>96 m²</span><span>2 qts</span><span>1 vg</span>
+            </div>
+            <div class="price-row">
+              <div class="price">R$ 540.000</div>
+              <a class="view" href="#">Ver detalhes</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="visual">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#FBF9F3" stroke-width="1.3"><path d="M3 20h18"/><path d="M5 20 5 9l7-5 7 5v11"/><path d="M9 20v-7h6v7"/></svg>
+            <div class="stamp"><span>Alugado</span></div>
+          </div>
+          <div class="body">
+            <div class="kind">Sobrado · Bela Vista</div>
+            <div class="addr">Rua Verona, 45</div>
+            <div class="specs">
+              <span>140 m²</span><span>3 qts</span><span>2 vgs</span>
+            </div>
+            <div class="price-row">
+              <div class="price">R$ 4.200/mês</div>
+              <a class="view" href="#">Ver detalhes</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="activity">
+      <div>
+        <div class="section-head"><h2>Próximas visitas</h2></div>
+        <div class="list">
+          <div class="row"><span class="when">Hoje 15h</span><span class="who">Renata Aquino</span><span class="what">Rua das Oliveiras, 214</span></div>
+          <div class="row"><span class="when">Qua 10h</span><span class="who">Diego Ferrari</span><span class="what">Av. Genova, 88</span></div>
+          <div class="row"><span class="when">Qui 17h</span><span class="who">Lívia Prado</span><span class="what">Rua Verona, 45</span></div>
+          <div class="row"><span class="when">Sex 9h</span><span class="who">Otávio Sales</span><span class="what">Rua das Palmeiras, 12</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-head"><h2>Contratos recentes</h2></div>
+        <div class="list">
+          <div class="row"><span class="who">Contrato #0231</span><span class="what">Aluguel · Bela Vista</span><span class="amt">R$ 4.200</span></div>
+          <div class="row"><span class="who">Contrato #0230</span><span class="what">Venda · Vila Toscana</span><span class="amt">R$ 540.000</span></div>
+          <div class="row"><span class="who">Contrato #0229</span><span class="what">Venda · Jardim Europa</span><span class="amt">R$ 890.000</span></div>
+          <div class="row"><span class="who">Contrato #0228</span><span class="what">Aluguel · Centro</span><span class="amt">R$ 2.750</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>Alleanza Immobiliare — sistema interno de gestão</span>
+      <span>v1.0 · mockup</span>
+    </footer>
+  </main>
+
+</div>
+</body>
+</html>
