@@ -1,3 +1,5 @@
+import os
+from datetime import datetime
 import pandas as pd
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from fpdf import FPDF
@@ -10,7 +12,10 @@ def exportar_corretores_excel():
         df = pd.read_sql(query, conexao)
         
         df.columns = ['ID', 'Nome Completo', 'CRECI', 'Telefone', 'E-mail']
-        filename = "Relatorio_Corretores.xlsx"
+        output_dir = os.path.join(os.path.dirname(__file__), 'relatórios')
+        os.makedirs(output_dir, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = os.path.join(output_dir, f"Relatorio_Corretores_{ts}.xlsx")
         
         with pd.ExcelWriter(filename, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Corretores', index=False)
@@ -65,6 +70,9 @@ def exportar_corretores_pdf():
             warnings.simplefilter("ignore")
             df = pd.read_sql(query, conexao)
         
+        output_dir = os.path.join(os.path.dirname(__file__), 'relatórios')
+        os.makedirs(output_dir, exist_ok=True)
+
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -110,8 +118,10 @@ def exportar_corretores_pdf():
             pdf.cell(70, 7, str(row['email']), border=1, align="L", fill=True)
             pdf.ln()
             
-        pdf.output("Relatorio_Corretores.pdf")
-        print("\n✅ Documento PDF Executivo 'Relatorio_Corretores.pdf' gerado com sucesso!")
+        ts_pdf = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pdf_filename = os.path.join(output_dir, f"Relatorio_Corretores_{ts_pdf}.pdf")
+        pdf.output(pdf_filename)
+        print(f"\n✅ Documento PDF Executivo '{pdf_filename}' gerado com sucesso!")
         
     except Exception as e:
         print(f"\n❌ Falha ao compilar PDF: {e}")
