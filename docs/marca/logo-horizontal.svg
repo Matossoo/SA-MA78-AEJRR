@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200">
+  <g transform="translate(20,20) scale(0.8)">
+    <circle cx="100" cy="100" r="92" fill="#2C3E32" stroke="#B8863E" stroke-width="4"/>
+    <path d="M68 142 V100 A32 32 0 0 1 132 100 V142" fill="none" stroke="#B8863E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="54" y1="142" x2="146" y2="142" stroke="#B8863E" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="100" cy="66" r="5" fill="#B8863E"/>
+  </g>
+  <text x="205" y="102" font-family="Georgia, 'Liberation Serif', 'Times New Roman', serif" font-style="italic" font-weight="600" font-size="54" fill="#23281F">Alleanza</text>
+  <text x="207" y="134" font-family="Arial, Helvetica, sans-serif" font-size="19" letter-spacing="4" fill="#8C6526">IMMOBILIARE</text>
+</svg>
