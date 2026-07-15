@@ -1,0 +1,21 @@
+# 📄 Documentação
+
+Esta pasta reúne toda a documentação do projeto **Alleanza Immobiliare**, desenvolvida durante o desenvolvimento da Situação de Aprendizagem.
+
+O objetivo é centralizar os documentos utilizados no planejamento, modelagem, desenvolvimento, validação e manutenção do sistema, facilitando a organização da equipe e o acompanhamento da evolução do projeto.
+
+
+```
+
+## Conteúdo
+
+- **MGP** – Planejamento e gerenciamento do projeto.
+- **MDS** – Requisitos e documentação técnica do sistema.
+- **DER / MER** – Modelagem do banco de dados.
+- **Dicionário de Dados** – Estrutura das entidades e atributos.
+- **Mockup** – Protótipos da interface do sistema.
+- **Atividades** – Documentos e entregas relacionadas ao desenvolvimento.
+
+## Organização
+
+Sempre que uma documentação for criada ou atualizada, ela deverá ser adicionada nesta pasta, mantendo a nomenclatura padronizada e facilitando o controle de versões através do Git.
