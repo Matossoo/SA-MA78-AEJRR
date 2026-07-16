@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_contratos():
 
@@ -13,36 +14,37 @@ def listar_contratos():
         id_venda,
         id_aluguel,
         data_assinatura,
+        data_inicio,
+        data_fim,
         clausulas
     FROM Contrato
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for contrato in dados:
-        print(contrato)
+    imprimir_tabela(cursor, titulo="CONTRATOS")
 
     cursor.close()
     conexao.close()
 
 
-def cadastrar_contrato(id_venda, id_aluguel, data_assinatura, clausulas):
+def cadastrar_contrato(id_venda, id_aluguel, data_assinatura, data_inicio, data_fim, clausulas):
 
     conexao = conectar()
     cursor = conexao.cursor()
 
     sql = """
     INSERT INTO Contrato
-    (id_venda,id_aluguel,data_assinatura,clausulas)
+    (id_venda,id_aluguel,data_assinatura,data_inicio,data_fim,clausulas)
     VALUES
-    (%s,%s,%s,%s)
+    (%s,%s,%s,%s,%s,%s)
     """
 
     valores = (
         id_venda,
         id_aluguel,
         data_assinatura,
+        data_inicio,
+        data_fim,
         clausulas
     )
 
@@ -55,14 +57,14 @@ def cadastrar_contrato(id_venda, id_aluguel, data_assinatura, clausulas):
     conexao.close()
 
 
-def atualizar_contrato(id_contrato, id_venda, id_aluguel, data_assinatura, clausulas):
+def atualizar_contrato(id_contrato, id_venda, id_aluguel, data_assinatura, data_inicio, data_fim, clausulas):
     try:
         conexao = conectar()
         cursor = conexao.cursor()
         sql = """UPDATE Contrato 
-                 SET id_venda=%s, id_aluguel=%s, data_assinatura=%s, clausulas=%s 
+                 SET id_venda=%s, id_aluguel=%s, data_assinatura=%s, data_inicio=%s, data_fim=%s, clausulas=%s 
                  WHERE id_contrato=%s"""
-        cursor.execute(sql, (id_venda, id_aluguel, data_assinatura, clausulas, id_contrato))
+        cursor.execute(sql, (id_venda, id_aluguel, data_assinatura, data_inicio, data_fim, clausulas, id_contrato))
         conexao.commit()
         print("\n✅ Contrato atualizado com sucesso!")
     except mysql.connector.errors.IntegrityError:

@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_documentos():
     conexao = conectar()
@@ -15,10 +16,7 @@ def listar_documentos():
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for documento in dados:
-        print(documento)
+    imprimir_tabela(cursor, titulo="DOCUMENTOS")
 
     cursor.close()
     conexao.close()

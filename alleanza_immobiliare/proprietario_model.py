@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_proprietarios():
     # abrir conexão
@@ -23,12 +24,8 @@ def listar_proprietarios():
     # executa sql
     cursor.execute(sql)
 
-    # recuperar dados
-    dados = cursor.fetchall()
-
-    # exibir dados
-    for proprietario in dados:
-        print(proprietario)
+    # exibir dados em tabela
+    imprimir_tabela(cursor, titulo="PROPRIETÁRIOS")
 
     # fechar conexão
     cursor.close()

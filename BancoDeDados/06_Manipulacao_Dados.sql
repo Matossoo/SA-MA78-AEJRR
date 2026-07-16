@@ -6,7 +6,7 @@
 -- INSERT
 -- Cadastra um novo cliente
 -- ============================================
-'''
+
 INSERT INTO Cliente (nome, cpf, telefone, email)
 VALUES (
     'Marcos Vinicius',
@@ -34,7 +34,7 @@ WHERE id_cliente = 4;
 -- ============================================
 
 UPDATE Imovel
-SET status = 'Vendido'
+SET status_imovel = 'Vendido'
 WHERE id_imovel = 1;
 
 
@@ -54,4 +54,3 @@ WHERE id_visita = 3;
 
 DELETE FROM Anuncio
 WHERE id_anuncio = 3;
-'''

@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_imoveis():
     conexao = conectar()
@@ -14,7 +15,8 @@ def listar_imoveis():
         e.rua,
         e.numero,
         i.valor_sugerido,
-        i.status
+        i.status_imovel,
+        i.data_cadastro
     FROM Imovel i
     JOIN Proprietario p
         ON i.id_proprietario = p.id_proprietario
@@ -25,24 +27,29 @@ def listar_imoveis():
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for imovel in dados:
-        print(imovel)
+    imprimir_tabela(cursor, titulo="IMÓVEIS", campos_moeda=["valor_sugerido"])
 
     cursor.close()
     conexao.close()
+
+
+STATUS_IMOVEL_VALIDOS = ('Disponível', 'Reservado', 'Vendido', 'Alugado', 'Em negociação', 'Indisponível')
 
 
 def cadastrar_imovel(id_proprietario,
                       id_tipo_imovel,
                       id_endereco,
                       valor_sugerido,
-                      status):
+                      status_imovel):
+
+    if status_imovel not in STATUS_IMOVEL_VALIDOS:
+        print(f"\n❌ Status inválido! Use um dos valores: {', '.join(STATUS_IMOVEL_VALIDOS)}")
+        return
 
     conexao = conectar()
     cursor = conexao.cursor()
 
+    # data_cadastro é preenchida automaticamente pelo banco (DEFAULT CURRENT_DATE)
     sql = """
     INSERT INTO Imovel
     (
@@ -50,7 +57,7 @@ def cadastrar_imovel(id_proprietario,
         id_tipo_imovel,
         id_endereco,
         valor_sugerido,
-        status
+        status_imovel
     )
     VALUES
     (%s,%s,%s,%s,%s)
@@ -61,7 +68,7 @@ def cadastrar_imovel(id_proprietario,
         id_tipo_imovel,
         id_endereco,
         valor_sugerido,
-        status
+        status_imovel
     )
 
     cursor.execute(sql, valores)
@@ -73,14 +80,17 @@ def cadastrar_imovel(id_proprietario,
     conexao.close()
 
 
-def atualizar_imovel(id_imovel, id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status):
+def atualizar_imovel(id_imovel, id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status_imovel):
+    if status_imovel not in STATUS_IMOVEL_VALIDOS:
+        print(f"\n❌ Status inválido! Use um dos valores: {', '.join(STATUS_IMOVEL_VALIDOS)}")
+        return
     try:
         conexao = conectar()
         cursor = conexao.cursor()
         sql = """UPDATE Imovel 
-                 SET id_proprietario=%s, id_tipo_imovel=%s, id_endereco=%s, valor_sugerido=%s, status=%s 
+                 SET id_proprietario=%s, id_tipo_imovel=%s, id_endereco=%s, valor_sugerido=%s, status_imovel=%s 
                  WHERE id_imovel=%s"""
-        cursor.execute(sql, (id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status, id_imovel))
+        cursor.execute(sql, (id_proprietario, id_tipo_imovel, id_endereco, valor_sugerido, status_imovel, id_imovel))
         conexao.commit()
         print("\n✅ Imóvel atualizado com sucesso!")
     except mysql.connector.errors.IntegrityError:

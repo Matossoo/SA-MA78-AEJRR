@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_clientes():
     conexao = conectar()
@@ -12,15 +13,13 @@ def listar_clientes():
         nome,
         cpf,
         telefone,
-        email
+        email,
+        data_cadastro
     FROM Cliente
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for cliente in dados:
-        print(cliente)
+    imprimir_tabela(cursor, titulo="CLIENTES")
 
     cursor.close()
     conexao.close()

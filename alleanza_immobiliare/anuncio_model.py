@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_anuncios():
 
@@ -18,11 +19,7 @@ def listar_anuncios():
     """
 
     cursor.execute(sql)
-
-    dados = cursor.fetchall()
-
-    for anuncio in dados:
-        print(anuncio)
+    imprimir_tabela(cursor, titulo="ANÚNCIOS")
 
     cursor.close()
     conexao.close()

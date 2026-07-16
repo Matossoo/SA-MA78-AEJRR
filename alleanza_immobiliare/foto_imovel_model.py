@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_fotos():
 
@@ -17,11 +18,7 @@ def listar_fotos():
     """
 
     cursor.execute(sql)
-
-    dados = cursor.fetchall()
-
-    for foto in dados:
-        print(foto)
+    imprimir_tabela(cursor, titulo="FOTOS DE IMÓVEL")
 
     cursor.close()
     conexao.close()

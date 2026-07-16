@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_visitas():
     conexao = conectar()
@@ -13,6 +14,7 @@ def listar_visitas():
         co.nome AS corretor,
         i.id_imovel,
         v.data_visita,
+        v.status_visita,
         v.observacoes
     FROM Visita v
     JOIN Cliente c ON v.id_cliente = c.id_cliente
@@ -21,10 +23,7 @@ def listar_visitas():
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for visita in dados:
-        print(visita)
+    imprimir_tabela(cursor, titulo="VISITAS")
 
     cursor.close()
     conexao.close()
@@ -75,6 +74,30 @@ def atualizar_visita(id_visita, id_cliente, id_corretor, id_imovel, data_visita,
             print("\n❌ Erro: Este corretor já possui compromisso agendado neste mesmo horário!")
         else:
             print("\n❌ Erro: Verifique se os IDs do cliente, corretor e imóvel informados existem!")
+    finally:
+        cursor.close()
+        conexao.close()
+
+
+STATUS_VISITA_VALIDOS = ('Agendada', 'Confirmada', 'Realizada', 'Cancelada', 'Cliente faltou')
+
+
+def atualizar_status_visita(id_visita, status_visita):
+    if status_visita not in STATUS_VISITA_VALIDOS:
+        print(f"\n❌ Status inválido! Use um dos valores: {', '.join(STATUS_VISITA_VALIDOS)}")
+        return
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+        sql = "UPDATE Visita SET status_visita=%s WHERE id_visita=%s"
+        cursor.execute(sql, (status_visita, id_visita))
+        conexao.commit()
+        if cursor.rowcount:
+            print("\n✅ Status da visita atualizado com sucesso!")
+        else:
+            print("\n❌ Nenhuma visita encontrada com esse ID.")
+    except mysql.connector.errors.IntegrityError:
+        print("\n❌ Erro ao atualizar o status da visita.")
     finally:
         cursor.close()
         conexao.close()

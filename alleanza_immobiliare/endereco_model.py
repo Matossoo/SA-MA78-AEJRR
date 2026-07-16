@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_enderecos():
     # abrir conexão
@@ -25,12 +26,8 @@ def listar_enderecos():
     # executa sql
     cursor.execute(sql)
 
-    # recuperar dados
-    dados = cursor.fetchall()
-
-    # exibir dados
-    for endereco in dados:
-        print(endereco)
+    # exibir dados em tabela
+    imprimir_tabela(cursor, titulo="ENDEREÇOS")
 
     # fechar conexão
     cursor.close()

@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_vendas():
 
@@ -10,8 +11,8 @@ def listar_vendas():
     sql="""
     SELECT
         v.id_venda,
-        c.nome,
-        co.nome,
+        c.nome AS cliente,
+        co.nome AS corretor,
         i.id_imovel,
         v.data_venda,
         v.valor_venda
@@ -22,10 +23,7 @@ def listar_vendas():
     """
 
     cursor.execute(sql)
-    dados=cursor.fetchall()
-
-    for venda in dados:
-        print(venda)
+    imprimir_tabela(cursor, titulo="VENDAS", campos_moeda=["valor_venda"])
 
     cursor.close()
     conexao.close()

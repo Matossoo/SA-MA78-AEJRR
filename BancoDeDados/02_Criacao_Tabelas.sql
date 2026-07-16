@@ -22,7 +22,8 @@ CREATE TABLE Cliente (
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) UNIQUE NOT NULL,
     telefone VARCHAR(20),
-    email VARCHAR(100)
+    email VARCHAR(100),
+    data_cadastro DATE NOT NULL DEFAULT (CURRENT_DATE)
 );
 
 CREATE TABLE Corretor (
@@ -51,7 +52,8 @@ CREATE TABLE Imovel (
     id_tipo_imovel INT,
     id_endereco INT,
     valor_sugerido DECIMAL(12, 2),
-    status VARCHAR(20) DEFAULT 'Disponível',
+    status_imovel ENUM ('Disponível','Reservado','Vendido','Alugado','Em negociação','Indisponível') NOT NULL DEFAULT 'Disponível',
+    data_cadastro DATE NOT NULL DEFAULT (CURRENT_DATE),
     FOREIGN KEY (id_proprietario) REFERENCES Proprietario(id_proprietario),
     FOREIGN KEY (id_tipo_imovel) REFERENCES TipoImovel(id_tipo_imovel),
     FOREIGN KEY (id_endereco) REFERENCES Endereco(id_endereco)
@@ -64,6 +66,7 @@ CREATE TABLE Visita (
     id_corretor INT,
     id_imovel INT,
     data_visita DATETIME NOT NULL,
+    status_visita ENUM ('Agendada','Confirmada','Realizada','Cancelada','Cliente faltou') NOT NULL DEFAULT 'Agendada',
     observacoes TEXT,
 
     FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente),
@@ -103,6 +106,8 @@ CREATE TABLE Contrato (
     id_venda INT NULL,     -- Pode ser nulo se o contrato for de aluguel
     id_aluguel INT NULL,   -- Pode ser nulo se o contrato for de venda
     data_assinatura DATE NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
     clausulas TEXT,
     FOREIGN KEY (id_venda) REFERENCES Venda(id_venda),
     FOREIGN KEY (id_aluguel) REFERENCES Aluguel(id_aluguel)
@@ -114,6 +119,8 @@ CREATE TABLE Pagamento (
     valor_pago DECIMAL(10, 2) NOT NULL,
     data_pagamento DATE NOT NULL,
     forma_pagamento VARCHAR(50),
+    status_pagamento ENUM ('Pago','Pendente','Atrasado','Cancelado') NOT NULL DEFAULT 'Pendente',
+    data_vencimento DATE NOT NULL,
     FOREIGN KEY (id_contrato) REFERENCES Contrato(id_contrato)
 );
 

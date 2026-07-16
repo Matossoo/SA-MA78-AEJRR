@@ -17,7 +17,7 @@ from corretor_model import listar_corretores, cadastrar_corretor, atualizar_corr
 from tipo_imovel_model import listar_tipos_imovel, cadastrar_tipo_imovel, atualizar_tipo_imovel, deletar_tipo_imovel
 from documento_model import listar_documentos, cadastrar_documento, atualizar_documento, deletar_documento
 from imovel_model import listar_imoveis, cadastrar_imovel, atualizar_imovel, deletar_imovel
-from visita_model import listar_visitas, cadastrar_visita, atualizar_visita, deletar_visita
+from visita_model import listar_visitas, cadastrar_visita, atualizar_visita, deletar_visita, atualizar_status_visita
 from venda_model import listar_vendas, cadastrar_venda, atualizar_venda, deletar_venda
 from aluguel_model import listar_alugueis, cadastrar_aluguel, atualizar_aluguel, deletar_aluguel
 from contrato_model import listar_contratos, cadastrar_contrato, atualizar_contrato, deletar_contrato
@@ -26,6 +26,7 @@ from imovel_documento_model import listar_imovel_documentos, cadastrar_imovel_do
 from anuncio_model import listar_anuncios, cadastrar_anuncio, atualizar_anuncio, deletar_anuncio
 from foto_imovel_model import listar_fotos, cadastrar_foto, atualizar_foto, deletar_foto
 from relatorio_model import exportar_corretores_excel, exportar_corretores_pdf
+from views_model import menu_views
 
 
 def ler_campo(rotulo, tipo="str"):
@@ -116,7 +117,8 @@ ENTIDADES = {
         "titulo": "IMÓVEL",
         "listar": listar_imoveis,
         "campos": [("ID Proprietário", "int"), ("ID Tipo Imóvel", "int"), ("ID Endereço", "int"),
-                   ("Valor sugerido", "float"), ("Status", "str")],
+                   ("Valor sugerido", "float"),
+                   ("Status (Disponível/Reservado/Vendido/Alugado/Em negociação/Indisponível)", "str")],
         "cadastrar": cadastrar_imovel,
         "atualizar": atualizar_imovel,
         "deletar": deletar_imovel,
@@ -131,6 +133,15 @@ ENTIDADES = {
         "atualizar": atualizar_visita,
         "deletar": deletar_visita,
         "id_rotulo": "ID Visita",
+        # Nova visita sempre nasce como "Agendada" (padrão do banco).
+        # Esta ação extra permite mudar o status depois (Confirmada,
+        # Realizada, Cancelada, Cliente faltou).
+        "acao_extra": {
+            "rotulo": "5 - Alterar status da visita",
+            "opcao": "5",
+            "funcao": atualizar_status_visita,
+            "campos": [("Status (Agendada/Confirmada/Realizada/Cancelada/Cliente faltou)", "str")],
+        },
     },
     "9": {
         "titulo": "VENDA",
@@ -162,7 +173,10 @@ ENTIDADES = {
         "listar": listar_contratos,
         "campos": [("ID Venda (Enter se não houver)", "int_opcional"),
                    ("ID Aluguel (Enter se não houver)", "int_opcional"),
-                   ("Data de Assinatura (AAAA-MM-DD)", "str"), ("Cláusulas", "str")],
+                   ("Data de Assinatura (AAAA-MM-DD)", "str"),
+                   ("Data de Início (AAAA-MM-DD)", "str"),
+                   ("Data de Fim (AAAA-MM-DD)", "str"),
+                   ("Cláusulas", "str")],
         "cadastrar": cadastrar_contrato,
         "atualizar": atualizar_contrato,
         "deletar": deletar_contrato,
@@ -172,7 +186,9 @@ ENTIDADES = {
         "titulo": "PAGAMENTO",
         "listar": listar_pagamentos,
         "campos": [("ID Contrato", "int"), ("Valor", "float"),
-                   ("Data pagamento (AAAA-MM-DD)", "str"), ("Método pagamento", "str")],
+                   ("Data pagamento (AAAA-MM-DD)", "str"), ("Método pagamento", "str"),
+                   ("Status (Pago/Pendente/Atrasado/Cancelado)", "str"),
+                   ("Data de vencimento (AAAA-MM-DD)", "str")],
         "cadastrar": cadastrar_pagamento,
         "atualizar": atualizar_pagamento,
         "deletar": deletar_pagamento,
@@ -226,6 +242,8 @@ ENTIDADES = {
 
 def submenu(entidade):
     """Submenu genérico de Listar/Cadastrar/Atualizar/Deletar para uma entidade."""
+    acao_extra = entidade.get("acao_extra")
+
     while True:
         print(f"\n===== {entidade['titulo']} =====")
         print("1 - Listar")
@@ -233,6 +251,8 @@ def submenu(entidade):
         if entidade["atualizar"]:
             print("3 - Atualizar")
         print("4 - Deletar")
+        if acao_extra:
+            print(acao_extra["rotulo"])
         print("0 - Voltar")
 
         escolha = input("Escolha: ")
@@ -252,6 +272,11 @@ def submenu(entidade):
         elif escolha == "4":
             id_valor = ler_campo(entidade["id_rotulo"], "int")
             entidade["deletar"](id_valor)
+
+        elif acao_extra and escolha == acao_extra["opcao"]:
+            id_valor = ler_campo(entidade["id_rotulo"], "int")
+            valores = ler_campos(acao_extra["campos"])
+            acao_extra["funcao"](id_valor, *valores)
 
         elif escolha == "0":
             break
@@ -284,6 +309,7 @@ def menu_principal():
         for num, titulo in opcoes_titulos:
             print(f"{num:<2} - {titulo}")
         print("16 - Gerar Relatórios 📊")
+        print("17 - Consultar Views 👁")
         print("0  - Sair")
 
         opcao = input("\nEscolha uma opção: ")
@@ -293,6 +319,8 @@ def menu_principal():
             break
         elif opcao == "16":
             menu_relatorios()
+        elif opcao == "17":
+            menu_views()
         elif opcao in ENTIDADES:
             submenu(ENTIDADES[opcao])
         else:

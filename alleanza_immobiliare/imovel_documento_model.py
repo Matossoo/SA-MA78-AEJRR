@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_imovel_documentos():
 
@@ -17,11 +18,7 @@ def listar_imovel_documentos():
     """
 
     cursor.execute(sql)
-
-    dados = cursor.fetchall()
-
-    for documento in dados:
-        print(documento)
+    imprimir_tabela(cursor, titulo="IMÓVEL x DOCUMENTO")
 
     cursor.close()
     conexao.close()

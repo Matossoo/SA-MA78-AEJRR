@@ -17,7 +17,7 @@ ORDER BY nome;
 SELECT i.id_imovel,
        p.nome AS proprietario,
        i.valor_sugerido,
-       i.status
+       i.status_imovel
 FROM Imovel i
 JOIN Proprietario p
 ON i.id_proprietario = p.id_proprietario
@@ -35,14 +35,14 @@ SELECT i.id_imovel,
 FROM Imovel i
 JOIN Endereco e
 ON i.id_endereco = e.id_endereco
-WHERE i.status = 'Disponível';
+WHERE i.status_imovel = 'Disponível';
 
 
 -- 5. Buscar imóveis com valor superior a R$ 500.000
 
 SELECT id_imovel,
        valor_sugerido,
-       status
+       status_imovel
 FROM Imovel
 WHERE valor_sugerido > 500000;
 
@@ -51,7 +51,7 @@ WHERE valor_sugerido > 500000;
 
 SELECT id_imovel,
        valor_sugerido,
-       status
+       status_imovel
 FROM Imovel
 WHERE valor_sugerido BETWEEN 200000 AND 400000;
 
@@ -77,7 +77,7 @@ JOIN TipoImovel t
 ON i.id_tipo_imovel = t.id_tipo_imovel
 JOIN Endereco e
 ON i.id_endereco = e.id_endereco
-WHERE i.status = 'Disponível'
+WHERE i.status_imovel = 'Disponível'
 AND t.descricao = 'Apartamento'
 AND i.valor_sugerido BETWEEN 300000 AND 600000;
 
@@ -113,10 +113,10 @@ FROM Imovel;
 
 -- 14. Mostrar a quantidade de imóveis agrupados por status
 
-SELECT status,
+SELECT status_imovel,
        COUNT(id_imovel) AS quantidade
 FROM Imovel
-GROUP BY status
+GROUP BY status_imovel
 ORDER BY quantidade DESC;
 
 
@@ -204,7 +204,7 @@ SELECT SUM(a.valor_aluguel) AS receita_mensal_total,
 FROM Aluguel a
 JOIN Imovel i
 ON a.id_imovel = i.id_imovel
-WHERE i.status = 'Alugado';
+WHERE i.status_imovel = 'Alugado';
 
 
 -- 23. Mostrar as formas de pagamento mais utilizadas pelos clientes
@@ -284,7 +284,7 @@ WHERE e.cidade = 'São Paulo';
 -- 28. Listar imóveis que não possuem documentos cadastrados
 
 SELECT i.id_imovel,
-       i.status,
+       i.status_imovel,
        p.nome AS proprietario,
        p.telefone
 FROM Imovel i
@@ -321,12 +321,12 @@ ON a.id_imovel = v.id_imovel;
 -- 31. Auditar imóveis vendidos ou alugados sem registro correspondente
 
 SELECT i.id_imovel,
-       i.status,
+       i.status_imovel,
        p.nome AS proprietario
 FROM Imovel i
 JOIN Proprietario p
 ON i.id_proprietario = p.id_proprietario
-WHERE i.status IN ('Vendido','Alugado')
+WHERE i.status_imovel IN ('Vendido','Alugado')
 AND i.id_imovel NOT IN
 (
     SELECT id_imovel
@@ -352,3 +352,4 @@ ON c.id_corretor = v.id_corretor
 GROUP BY c.id_corretor,
          c.nome
 ORDER BY comissao DESC;
+

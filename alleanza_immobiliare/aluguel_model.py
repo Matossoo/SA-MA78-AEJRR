@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_alugueis():
 
@@ -10,8 +11,8 @@ def listar_alugueis():
     sql="""
     SELECT
         a.id_aluguel,
-        c.nome,
-        co.nome,
+        c.nome AS cliente,
+        co.nome AS corretor,
         i.id_imovel,
         a.data_inicio,
         a.valor_aluguel
@@ -22,10 +23,7 @@ def listar_alugueis():
     """
 
     cursor.execute(sql)
-    dados=cursor.fetchall()
-
-    for aluguel in dados:
-        print(aluguel)
+    imprimir_tabela(cursor, titulo="ALUGUÉIS", campos_moeda=["valor_aluguel"])
 
     cursor.close()
     conexao.close()

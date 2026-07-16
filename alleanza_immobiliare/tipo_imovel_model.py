@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_tipos_imovel():
     conexao = conectar()
@@ -14,10 +15,7 @@ def listar_tipos_imovel():
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for tipo in dados:
-        print(tipo)
+    imprimir_tabela(cursor, titulo="TIPOS DE IMÓVEL")
 
     cursor.close()
     conexao.close()

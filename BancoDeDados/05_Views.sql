@@ -9,13 +9,13 @@ SELECT
     t.descricao AS tipo_imovel,
     p.nome AS proprietario,
     i.valor_sugerido,
-    i.status
+    i.status_imovel
 FROM Imovel i
 JOIN TipoImovel t
     ON i.id_tipo_imovel = t.id_tipo_imovel
 JOIN Proprietario p
     ON i.id_proprietario = p.id_proprietario
-WHERE i.status = 'Disponível';
+WHERE i.status_imovel = 'Disponível';
 
 
 -- 2. Agenda de visitas

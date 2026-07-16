@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import conectar
+from table_utils import imprimir_tabela
 
 def listar_corretores():
     conexao = conectar()
@@ -17,10 +18,7 @@ def listar_corretores():
     """
 
     cursor.execute(sql)
-    dados = cursor.fetchall()
-
-    for corretor in dados:
-        print(corretor)
+    imprimir_tabela(cursor, titulo="CORRETORES")
 
     cursor.close()
     conexao.close()
